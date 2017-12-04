@@ -16,6 +16,7 @@ public class Window extends JFrame{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings({ "unused", "static-access" })
 	private Window()
     {
         // Sets the title for this frame.
