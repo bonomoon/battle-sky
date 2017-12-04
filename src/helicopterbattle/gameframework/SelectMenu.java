@@ -38,7 +38,7 @@ public class SelectMenu {
 	private JButton btn;
 
 	public SelectMenu() {
-		Framework.gameState = Framework.GameState.SELECT_MENU_LOADING;
+		Framework.gameState = Framework.GameState.STARTING;
 
 		Thread threadForInitSelectMenu = new Thread() {
 			@Override

@@ -173,7 +173,7 @@ public class Framework extends Canvas {
 				
 				break;
 			case SELECT_MENU_LOADING:
-				
+				selectMenu = new SelectMenu();
 				break;
 			case OPTIONS:
 				// ...
