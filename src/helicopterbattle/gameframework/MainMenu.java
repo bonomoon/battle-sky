@@ -15,23 +15,27 @@ import javax.swing.JButton;
 
 import helicopterbattle.gameframework.Framework.GameState;
 
-public class MainMenu {
-    // Images for menu.
+public class MainMenu{
+	
+	// Images for menu.
     private BufferedImage menuBackGround;
     private BufferedImage gameTitleImg;
     private BufferedImage menuBorderImg;
 	private BufferedImage gameStartPressImg;
 	private BufferedImage multiStartPressImg;
 	private BufferedImage exitPressImg;
+    private JButton btn;
     
     ImageIcon gameStartNotPressImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/game_start_not_press.png"));
-    private final JButton gameStartBtn = new JButton(gameStartNotPressImg);
+    protected final JButton gameStartBtn = new JButton(gameStartNotPressImg);
     ImageIcon multiStartNotPressImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/multi_start_not_press.png"));
-    private final JButton multiStartBtn = new JButton(multiStartNotPressImg);
+    protected final JButton multiStartBtn = new JButton(multiStartNotPressImg);
     ImageIcon exitNotPressImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/exit_not_press.png"));
-    private final JButton exitBtn = new JButton(exitNotPressImg);
+    protected final JButton exitBtn = new JButton(exitNotPressImg);
     
 	public MainMenu() {
+    	Framework.gameState = Framework.GameState.STARTING;
+    	
         Thread threadForInitMainMenu= new Thread() {
             @Override
             public void run() {
@@ -39,21 +43,17 @@ public class MainMenu {
                 Initialize();
                 // Load game files (images, sounds, ...)
                 LoadContent();
-//                Framework.gameState = Framework.GameState.PLAYING;
+                Framework.gameState = Framework.GameState.MAIN_MENU;
             }
         };
         threadForInitMainMenu.start();
     }
-	
+
     private void Initialize() {
-       
+
     }
     
-    /**
-     * Load files (images).
-     * This method is intended to load files for this class, files for the actual game can be loaded in Game.java.
-     */
-    private void LoadContent() {
+    public void LoadContent() {
         try {
             URL menuBackGroundUrl = this.getClass().getResource("/helicopterbattle/resources/images/game_menu_backgroud.jpg");
             menuBackGround = ImageIO.read(menuBackGroundUrl);
@@ -72,13 +72,18 @@ public class MainMenu {
 			
 			URL exitPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/exit_press.png");
 			exitPressImg = ImageIO.read(exitPressImgUrl);
-
         } catch (IOException ex) {
             Logger.getLogger(Framework.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     public void UpdateMainMenu() {
+    	UpdateGameStartBtn();
+    	UpdateMultiStartBtn();
+    	UpdateExitBtn();
+    }
+    
+    private void UpdateGameStartBtn() {
         gameStartBtn.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseExited(MouseEvent e) {
@@ -94,9 +99,11 @@ public class MainMenu {
         		multiStartBtn.setVisible(false);
         		exitBtn.setVisible(false);
         		Framework.gameState = GameState.SELECT_MENU;
+        		return;
         	}
         });
-
+    }
+    private void UpdateMultiStartBtn() {
         multiStartBtn.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseExited(MouseEvent e) {
@@ -112,9 +119,11 @@ public class MainMenu {
         		multiStartBtn.setVisible(false);
         		exitBtn.setVisible(false);
         		Framework.gameState = GameState.MULTI_PLAY;
+        		return;
         	}
         });
-
+    }
+    private void UpdateExitBtn() {
         exitBtn.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseExited(MouseEvent e) {
@@ -126,12 +135,26 @@ public class MainMenu {
         	}
         	@Override
         	public void mouseClicked(MouseEvent e) {
-        		
         		System.exit(0);
         	}
         });
     }
     public void Draw(Graphics2D g2d) {
-    	
+        drawMenuBackground(g2d);
+    }
+    
+    private void drawMenuBackground(Graphics2D g2d){
+        g2d.drawImage(menuBackGround,  0, 0, Framework.frameWidth, Framework.frameHeight, null);
+        g2d.drawImage(menuBorderImg,  0, 0, Framework.frameWidth, Framework.frameHeight, null);
+        g2d.drawImage(gameTitleImg, Framework.frameWidth/2 - gameTitleImg.getWidth()/2, Framework.frameHeight/4, null);
+    }
+    
+    public JButton addMenuButton(JButton btn, int xCoordinate, int yCoordinate, int width, int height) {
+    	this.btn = btn;
+        this.btn.setBounds(xCoordinate, yCoordinate, width, height);
+        this.btn.setBorderPainted(false);
+        this.btn.setContentAreaFilled(false);
+        this.btn.setFocusPainted(false);
+        return this.btn;
     }
 }

@@ -11,7 +11,12 @@ import javax.swing.SwingUtilities;
 
 public class Window extends JFrame{
         
-    private Window()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Window()
     {
         // Sets the title for this frame.
         this.setTitle("Helicopter battle");

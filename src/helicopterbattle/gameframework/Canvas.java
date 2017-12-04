@@ -11,10 +11,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -24,8 +21,9 @@ import javax.swing.JPanel;
  */
 
 public abstract class Canvas extends JPanel implements KeyListener, MouseListener {
-    
-    // Keyboard states - Here are stored states for keyboard keys - is it down or not.
+	private static final long serialVersionUID = 1L;
+
+	// Keyboard states - Here are stored states for keyboard keys - is it down or not.
     private static boolean[] keyboardState = new boolean[525];
     
     // Mouse states - Here are stored states for mouse keys - is it down or not.

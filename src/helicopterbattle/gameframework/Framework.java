@@ -20,7 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import helicopterbattle.game.Bgm;
-import helicopterbattle.game.PlayerHelicopter;
 import helicopterbattle.net.GameClient;
 import helicopterbattle.net.GameServer;
 import helicopterbattle.net.packets.Packet00Login;
@@ -32,6 +31,8 @@ import helicopterbattle.net.packets.Packet00Login;
  */
 
 public class Framework extends Canvas {
+	private static final long serialVersionUID = 1L;
+	
 	Bgm introBgm = new Bgm("999.mp3",true);
     /**
      * Width of the frame.
@@ -67,11 +68,11 @@ public class Framework extends Canvas {
     /**
      * Possible states of the game
      */
-    public static enum GameState{STARTING, VISUALIZING, GAME_CONTENT_LOADING, MAIN_MENU, SELECT_MENU, MULTI_PLAY, MULTI_GAME, OPTIONS, PLAYING, GAMEOVER, DESTROYED}
+    public static enum GameState{STARTING, VISUALIZING, GAME_CONTENT_LOADING, MAIN_MENU, SELECT_MENU, MULTI_PLAY, OPTIONS, PLAYING, GAMEOVER, DESTROYED}
     /**
      * Current state of the game
      */
-    public static GameState gameState;
+    protected static GameState gameState;
     
     /**
      * Elapsed game time in nanoseconds.
@@ -82,11 +83,10 @@ public class Framework extends Canvas {
     
     // The actual game
     private Game game;
-    
+	private MainMenu mainMenu;
+	
     private Font font;
     
-    private PlayerHelicopter multiPlayer;
-    private String username = null;
     private GameClient socketClient;
     private GameServer socketServer;
     
@@ -95,24 +95,6 @@ public class Framework extends Canvas {
     private BufferedImage gameTitleImg;
     private BufferedImage menuBorderImg;
     private BufferedImage selectMenuImg;
-    private BufferedImage skyColorImg;
-	private BufferedImage cloudLayer1Img;
-	private BufferedImage cloudLayer2Img;
-	private BufferedImage gameStartPressImg;
-	private BufferedImage multiStartPressImg;
-	private BufferedImage exitPressImg;
-	private BufferedImage jetImg;
-    private BufferedImage helicopter1Img;
-    private BufferedImage airballoonImg;
-    private BufferedImage helicopter2Img;
-    
-    ImageIcon gameStartNotPressImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/game_start_not_press.png"));
-    private final JButton gameStartBtn = new JButton(gameStartNotPressImg);
-    ImageIcon multiStartNotPressImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/multi_start_not_press.png"));
-    private final JButton multiStartBtn = new JButton(multiStartNotPressImg);
-    ImageIcon exitNotPressImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/exit_not_press.png"));
-    private final JButton exitBtn = new JButton(exitNotPressImg);
-    
     ImageIcon jetSelectImg = new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/jet_select.png"));
     private final JButton jetSelectBtn = new JButton(jetSelectImg);
     
@@ -160,47 +142,9 @@ public class Framework extends Canvas {
      */
     private void LoadContent() {
         try {
-            URL menuBackGroundUrl = this.getClass().getResource("/helicopterbattle/resources/images/game_menu_backgroud.jpg");
-            menuBackGround = ImageIO.read(menuBackGroundUrl);
-            
-            URL menuBorderImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/menu_border.png");
-            menuBorderImg = ImageIO.read(menuBorderImgUrl);
-            
-            URL skyColorImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/sky_color.jpg");
-            skyColorImg = ImageIO.read(skyColorImgUrl);
-            
-            URL gameTitleImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/helicopter_battle_title.png");
-            gameTitleImg = ImageIO.read(gameTitleImgUrl);
-            
             URL selectMenuImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/select_menu.png");
             selectMenuImg = ImageIO.read(selectMenuImgUrl);
             
-            URL cloudLayer1ImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/cloud_layer_1.png");
-            cloudLayer1Img = ImageIO.read(cloudLayer1ImgUrl);
-            
-            URL cloudLayer2ImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/cloud_layer_2.png");
-            cloudLayer2Img = ImageIO.read(cloudLayer2ImgUrl);
-
-            URL gameStartPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/game_start_press.png");
-            gameStartPressImg = ImageIO.read(gameStartPressImgUrl);   
-            
-			URL multiStartPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/multi_start_press.png");
-			multiStartPressImg = ImageIO.read(multiStartPressImgUrl);
-			
-			URL exitPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/exit_press.png");
-			exitPressImg = ImageIO.read(exitPressImgUrl);
-
-            URL jetImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/jet_body_left.png");
-            jetImg = ImageIO.read(jetImgUrl);
-            
-            URL helicopter1ImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/1_helicopter_body_right.png");
-            helicopter1Img = ImageIO.read(helicopter1ImgUrl);
-            
-            URL helicopter2ImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_helicopter_body_left.png");
-            helicopter2Img = ImageIO.read(helicopter2ImgUrl);
-            
-            URL airballoonImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/air_ballon.png");
-            airballoonImg = ImageIO.read(airballoonImgUrl);
         } catch (IOException ex) {
             Logger.getLogger(Framework.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -225,10 +169,6 @@ public class Framework extends Canvas {
             switch (gameState)
             {
                 case PLAYING:
-                    BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-                    java.awt.Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
-                    this.setCursor(blankCursor);
-                    
                     gameTime += System.nanoTime() - lastTime;
                     
                     game.UpdateGame(gameTime, mousePosition());
@@ -239,107 +179,22 @@ public class Framework extends Canvas {
 
                 break;
                 case MULTI_PLAY:
-                	//multiPlayer = new PlayerHelicopter(Framework.frameWidth / 4, Framework.frameHeight / 4, JOptionPane.showInputDialog(this, "Please enter a username"));
-                    //PlayerHelicopter.username = JOptionPane.showInputDialog(this, "Please enter a username"));
                     if(JOptionPane.showConfirmDialog(this, "Do you want to run the server") == 0) {
                     	socketServer = new GameServer(this);
                     	socketServer.start();                   
                     }
                     socketClient = new GameClient(this, "localhost");
                     socketClient.start();
-//                    socketClient.sendData("ping".getBytes());
                     Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Please enter a username"));
                     loginPacket.writeData(socketClient);
                     gameState = GameState.SELECT_MENU;
-//                    Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Please enter a username"));
-//                    loginPacket.writeData(socketClient);
+
                 break;
-                case MULTI_GAME:
-                    BufferedImage blankCursorImg2 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-                    java.awt.Cursor blankCursor2 = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg2, new Point(0, 0), null);
-                    this.setCursor(blankCursor2);
-                    
-                    gameTime += System.nanoTime() - lastTime;
-                    
-                    game.UpdateGame(gameTime, mousePosition());
-                    
-                    lastTime = System.nanoTime();
-                break;
-                case MAIN_MENU:    
-                    gameStartBtn.setBounds(frameWidth / 2 - 250, frameHeight / 2 + 100, 500, 100);
-                    gameStartBtn.setBorderPainted(false);
-                    gameStartBtn.setContentAreaFilled(false);
-                    gameStartBtn.setFocusPainted(false);
-                    gameStartBtn.addMouseListener(new MouseAdapter() {
-                    	@Override
-                    	public void mouseExited(MouseEvent e) {
-                    		gameStartBtn.setIcon(new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/game_start_not_press.png")));
-                    	}
-                    	@Override
-                    	public void mouseEntered(MouseEvent e) {
-                    		gameStartBtn.setIcon(new ImageIcon(gameStartPressImg));                    		
-                    	}
-                    	@Override
-                    	public void mouseClicked(MouseEvent e) {
-                    		gameStartBtn.setVisible(false);
-                    		multiStartBtn.setVisible(false);
-                    		exitBtn.setVisible(false);
-                    		gameState = GameState.SELECT_MENU;
-                    	}
-                    });
-                    add(gameStartBtn);
-                    
-                    multiStartBtn.setBounds(frameWidth / 2 - 250, frameHeight / 2 + 225, 500, 100);
-                    multiStartBtn.setBorderPainted(false);
-                    multiStartBtn.setContentAreaFilled(false);
-                    multiStartBtn.addMouseListener(new MouseAdapter() {
-                    	@Override
-                    	public void mouseExited(MouseEvent e) {
-                    		 multiStartBtn.setIcon(new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/multi_start_not_press.png")));
-                    	}
-                    	@Override
-                    	public void mouseEntered(MouseEvent e) {
-                    		multiStartBtn.setIcon(new ImageIcon(multiStartPressImg));                    		
-                    	}
-                    	@Override
-                    	public void mouseClicked(MouseEvent e) {
-                    		gameStartBtn.setVisible(false);
-                    		multiStartBtn.setVisible(false);
-                    		exitBtn.setVisible(false);
-                    		gameState = GameState.MULTI_PLAY;
-                    	}
-                    });
-                    add(multiStartBtn);
-                  
-                    exitBtn.setBounds(frameWidth / 2 - 250, frameHeight / 2 + 350, 500, 100);
-                    exitBtn.setBorderPainted(false);
-                    exitBtn.setContentAreaFilled(false);
-                    exitBtn.addMouseListener(new MouseAdapter() {
-                    	@Override
-                    	public void mouseExited(MouseEvent e) {
-                    		 exitBtn.setIcon(new ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/exit_not_press.png")));
-                    	}
-                    	@Override
-                    	public void mouseEntered(MouseEvent e) {
-                    		exitBtn.setIcon(new ImageIcon(exitPressImg));                    		
-                    	}
-                    	@Override
-                    	public void mouseClicked(MouseEvent e) {
-                    		
-                    		System.exit(0);
-                    	}
-                    });
-                    add(exitBtn);
+                case MAIN_MENU:
+                	mainMenu.UpdateMainMenu();
 
                 break;
                 case SELECT_MENU:
-                    //Packet00Login loginPacket = new Packet00Login("bong");
-                	//Packet00Login loginPacket = new Packet00Login(JOptionPane.showInputDialog(this, "Please enter a username"));
-                    //loginPacket.writeData(socketClient);
-                    jetSelectBtn.setBounds(frameWidth / 4 - 550, frameHeight / 2 - 300, 600, 800);
-                    jetSelectBtn.setBorderPainted(false);
-                    jetSelectBtn.setContentAreaFilled(false);
-                    jetSelectBtn.setFocusPainted(false);
                     jetSelectBtn.addMouseListener(new MouseAdapter() {
                     	@Override
                     	public void mouseExited(MouseEvent e) {
@@ -359,12 +214,6 @@ public class Framework extends Canvas {
                     		newGame();
                     	}
                     });
-                    add(jetSelectBtn);
-                	
-                    heliSelectBtn.setBounds(frameWidth / 4 - 50, frameHeight / 2 - 300, 600, 800);
-                    heliSelectBtn.setBorderPainted(false);
-                    heliSelectBtn.setContentAreaFilled(false);
-                    heliSelectBtn.setFocusPainted(false);
                     heliSelectBtn.addMouseListener(new MouseAdapter() {
                     	@Override
                     	public void mouseExited(MouseEvent e) {
@@ -384,12 +233,6 @@ public class Framework extends Canvas {
                     		newGame();
                     	}
                     });
-                    add(heliSelectBtn);
-
-                    airBallonSelectBtn.setBounds(frameWidth / 2 - 50, frameHeight / 2 - 300, 600, 800);
-                    airBallonSelectBtn.setBorderPainted(false);
-                    airBallonSelectBtn.setContentAreaFilled(false);
-                    airBallonSelectBtn.setFocusPainted(false);
                     airBallonSelectBtn.addMouseListener(new MouseAdapter() {
                     	@Override
                     	public void mouseExited(MouseEvent e) {
@@ -409,12 +252,7 @@ public class Framework extends Canvas {
                     		newGame();
                     	}
                     });
-                    add(airBallonSelectBtn);
                     
-                    heli2SelectBtn.setBounds(frameWidth*3 / 4 - 50, frameHeight / 2 - 300, 600, 800);
-                    heli2SelectBtn.setBorderPainted(false);
-                    heli2SelectBtn.setContentAreaFilled(false);
-                    heli2SelectBtn.setFocusPainted(false);
                     heli2SelectBtn.addMouseListener(new MouseAdapter() {
                     	@Override
                     	public void mouseExited(MouseEvent e) {
@@ -434,7 +272,6 @@ public class Framework extends Canvas {
                     		newGame();
                     	}
                     });
-                    add(heli2SelectBtn);
                     
                 break;
                 case OPTIONS:
@@ -448,9 +285,7 @@ public class Framework extends Canvas {
                     Initialize();
                     // Load files - images, sounds, ...
                     LoadContent();
-
                     // When all things that are called above finished, we change game status to main menu.
-                    gameState = GameState.MAIN_MENU;
                 break;
                 case VISUALIZING:
                     // On Ubuntu OS (when I tested on my old computer) this.getWidth() method doesn't return the correct value immediately (eg. for frame that should be 800px width, returns 0 than 790 and at last 798px). 
@@ -461,9 +296,7 @@ public class Framework extends Canvas {
                     {
                         frameWidth = this.getWidth();
                         frameHeight = this.getHeight();
-
-                        // When we get size of frame we change status.
-                        gameState = GameState.STARTING;
+                        mainMenu = new MainMenu();
                     }
                     else
                     {
@@ -471,6 +304,8 @@ public class Framework extends Canvas {
                         lastVisualizingTime = System.nanoTime();
                     }
                 break;
+                default:
+				break;
             }
             
             // Repaint the screen.
@@ -498,6 +333,10 @@ public class Framework extends Canvas {
         switch (gameState)
         {
             case PLAYING:
+                BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+                java.awt.Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
+                this.setCursor(blankCursor);
+                
                 game.Draw(g2d, mousePosition(), gameTime);
             break;
             case GAMEOVER:
@@ -513,11 +352,35 @@ public class Framework extends Canvas {
                 g2d.drawImage(gameTitleImg, frameWidth/2 - gameTitleImg.getWidth()/2, frameHeight/4, null);
             break;
             case MAIN_MENU:
-                drawMenuBackground(g2d);
-                g2d.drawImage(gameTitleImg, frameWidth/2 - gameTitleImg.getWidth()/2, frameHeight/4, null);
+            	mainMenu.Draw(g2d);
+            	add(mainMenu.addMenuButton(mainMenu.gameStartBtn, Framework.frameWidth / 2 - 250, Framework.frameHeight / 2 + 100, 500, 100));
+            	
             break;
             case SELECT_MENU:
                 g2d.drawImage(selectMenuImg, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
+                jetSelectBtn.setBounds(frameWidth / 4 - 550, frameHeight / 2 - 300, 600, 800);
+                jetSelectBtn.setBorderPainted(false);
+                jetSelectBtn.setContentAreaFilled(false);
+                jetSelectBtn.setFocusPainted(false);
+                add(jetSelectBtn);
+            	
+                heliSelectBtn.setBounds(frameWidth / 4 - 50, frameHeight / 2 - 300, 600, 800);
+                heliSelectBtn.setBorderPainted(false);
+                heliSelectBtn.setContentAreaFilled(false);
+                heliSelectBtn.setFocusPainted(false);
+                add(heliSelectBtn);
+
+                airBallonSelectBtn.setBounds(frameWidth / 2 - 50, frameHeight / 2 - 300, 600, 800);
+                airBallonSelectBtn.setBorderPainted(false);
+                airBallonSelectBtn.setContentAreaFilled(false);
+                airBallonSelectBtn.setFocusPainted(false);
+                add(airBallonSelectBtn);
+                
+                heli2SelectBtn.setBounds(frameWidth*3 / 4 - 50, frameHeight / 2 - 300, 600, 800);
+                heli2SelectBtn.setBorderPainted(false);
+                heli2SelectBtn.setContentAreaFilled(false);
+                heli2SelectBtn.setFocusPainted(false);
+                add(heli2SelectBtn);
             break;
             case OPTIONS:
                 //...
@@ -527,6 +390,8 @@ public class Framework extends Canvas {
                 g2d.setColor(Color.white);
                 g2d.drawString("GAME is LOADING", frameWidth/2 - 50, frameHeight/2);
             break;
+            default:
+			break;
         }
     }
     
@@ -535,23 +400,6 @@ public class Framework extends Canvas {
         g2d.drawImage(menuBorderImg,  0, 0, Framework.frameWidth, Framework.frameHeight, null);
     }
     
-//    private JButton drawButton(BufferedImage img) {
-////		ImageIcon normalIcon = new ImageIcon("images/normalIcon.gif");
-////		ImageIcon rolloverIcon = new ImageIcon("images/rolloverIcon.gif");
-////		ImageIcon pressedIcon = new ImageIcon("images/pressedIcon.gif");
-//
-//		JButton btn = new JButton();
-////		btn.setPressedIcon(pressedIcon); // pressedIcon용 이미지 등록
-////		btn.setRolloverIcon(rolloverIcon); // rolloverIcon용 이미지 등록
-////		add(btn);
-//		try {
-//			btn.setIcon(new ImageIcon(img));
-//		} catch (Exception ex) {
-//			System.out.println(ex);
-//		}
-//		
-//		return btn;
-//	}
     /**
      * Starts new game.
      */
@@ -625,6 +473,8 @@ public class Framework extends Canvas {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER)
                     gameState = GameState.SELECT_MENU;
             break;
+            default:
+			break;
         }
     }
     
@@ -640,6 +490,8 @@ public class Framework extends Canvas {
         	case SELECT_MENU:
         		
         	break;
+        	default:
+			break;
         }
     }
 }
