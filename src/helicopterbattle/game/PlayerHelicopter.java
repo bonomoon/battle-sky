@@ -1,7 +1,5 @@
 package helicopterbattle.game;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -12,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.JTextArea;
 
 import helicopterbattle.gameframework.Canvas;
 import helicopterbattle.gameframework.Game;
@@ -24,7 +21,7 @@ import helicopterbattle.gameframework.Game.FlightState;
  * @author www.gametutorial.net
  */
 
-public class PlayerHelicopter {
+public class PlayerHelicopter implements Player {
     
     // Health of the helicopter.
     private final int healthInit = 300;
@@ -177,13 +174,11 @@ public class PlayerHelicopter {
     }
     
     
-    /**
-     * Resets the player.
-     * 
-     * @param xCoordinate Starting x coordinate of helicopter.
-     * @param yCoordinate Starting y coordinate of helicopter.
-     */
-    public void Reset(int xCoordinate, int yCoordinate)
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#Reset(int, int)
+	 */
+    @Override
+	public void Reset(int xCoordinate, int yCoordinate)
     {
         this.health = healthInit;
         
@@ -201,14 +196,11 @@ public class PlayerHelicopter {
     }
     
     
-    /**
-     * Checks if player is shooting. It also checks if player can 
-     * shoot (time between bullets, does a player have any bullet left).
-     * 
-     * @param gameTime The current elapsed game time in nanoseconds.
-     * @return true if player is shooting.
-     */
-    public boolean isShooting(long gameTime)
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#isShooting(long)
+	 */
+    @Override
+	public boolean isShooting(long gameTime)
     {
         // Checks if left mouse button is down && if it is the time for a new bullet.
         if( Canvas.mouseButtonState(MouseEvent.BUTTON1) && 
@@ -221,14 +213,11 @@ public class PlayerHelicopter {
     }
     
     
-    /**
-     * Checks if player is fired a rocket. It also checks if player can 
-     * fire a rocket (time between rockets, does a player have any rocket left).
-     * 
-     * @param gameTime The current elapsed game time in nanoseconds.
-     * @return true if player is fired a rocket.
-     */
-    public boolean isFiredRocket(long gameTime)
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#isFiredRocket(long)
+	 */
+    @Override
+	public boolean isFiredRocket(long gameTime)
     {
         // Checks if right mouse button is down && if it is the time for new rocket && if he has any rocket left.
         if( Canvas.mouseButtonState(MouseEvent.BUTTON3) && 
@@ -241,10 +230,11 @@ public class PlayerHelicopter {
     }
     
     
-    /**
-     * Checks if player moving helicopter and sets its moving speed if player is moving.
-     */
-    public void isMoving()
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#isMoving()
+	 */
+    @Override
+	public void isMoving()
     {
         // Moving on the x coordinate.
         if(Canvas.keyboardKeyState(KeyEvent.VK_D) || Canvas.keyboardKeyState(KeyEvent.VK_RIGHT))
@@ -276,10 +266,11 @@ public class PlayerHelicopter {
 //        txtrUsername.setText(username);
 //        add(txtrUsername);
 //    }
-    /**
-     * Updates position of helicopter, animations.
-     */
-    public void Update()
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#Update()
+	 */
+    @Override
+	public void Update()
     {
         // Move helicopter and its propellers.
         xCoordinate += movingXspeed;
@@ -296,19 +287,22 @@ public class PlayerHelicopter {
         this.machineGunYcoordinate = this.yCoordinate + this.offsetYMachineGun;
     }
     
-    public boolean IsPropeller(Game.FlightState flightState) {
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#IsPropeller(helicopterbattle.gameframework.Game.FlightState)
+	 */
+    @Override
+	public boolean IsPropeller(Game.FlightState flightState) {
     	if(flightState == FlightState.HELICOPTER1 || flightState == FlightState.HELICOPTER2)
     		return true;
     	else
     		
     		return false;
     }
-    /**
-     * Draws helicopter to the screen.
-     * 
-     * @param g2d Graphics2D
-     */
-    public void Draw(Graphics2D g2d)
+    /* (non-Javadoc)
+	 * @see helicopterbattle.game.Player#Draw(java.awt.Graphics2D)
+	 */
+    @Override
+	public void Draw(Graphics2D g2d)
     {
     	if(IsPropeller(Game.flightState)) {
             helicopterFrontPropellerAnim.Draw(g2d);
