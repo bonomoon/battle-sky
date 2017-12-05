@@ -26,7 +26,7 @@ import helicopterbattle.net.packets.Packet00Login;
 public class Framework extends Canvas {
 	private static final long serialVersionUID = 1L;
 
-	Bgm introBgm = new Bgm("999.mp3", true);
+	private Bgm introBgm = new Bgm("999.mp3", true);
 	/**
 	 * Width of the frame.
 	 */
@@ -278,7 +278,6 @@ public class Framework extends Canvas {
 			// ...
 			break;
 		case GAME_CONTENT_LOADING:
-
 			g2d.setColor(Color.white);
 			g2d.drawString("GAME is LOADING", frameWidth / 2 - 50, frameHeight / 2);
 			break;
