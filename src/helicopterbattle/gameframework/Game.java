@@ -100,20 +100,22 @@ public class Game {
     
     
 	public Game() {
-		Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
-
-        Thread threadForInitGame = new Thread() {
-            @Override
-            public void run() {
-                // Sets variables and objects for the game.
-                Initialize();
-                // Load game files (images, sounds, ...)
-                LoadContent();
-                
-                Framework.gameState = Framework.GameState.PLAYING;
-            }
-        };
-        threadForInitGame.start();
+	//	Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
+        Initialize();
+        LoadContent();
+        Framework.gameState = Framework.GameState.PLAYING;
+//        Thread threadForInitGame = new Thread() {
+//            @Override
+//            public void run() {
+//                // Sets variables and objects for the game.
+//                Initialize();
+//                // Load game files (images, sounds, ...)
+//                LoadContent();
+//                
+//                Framework.gameState = Framework.GameState.PLAYING;
+//            }
+//        };
+//        threadForInitGame.start();
     }
     
     
@@ -164,12 +166,16 @@ public class Game {
             // Images of environment
             URL skyColorImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/sky_color.jpg");
             skyColorImg = ImageIO.read(skyColorImgUrl);
+            
             URL cloudLayer1ImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/cloud_layer_1.png");
             cloudLayer1Img = ImageIO.read(cloudLayer1ImgUrl);
+            
             URL cloudLayer2ImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/cloud_layer_2.png");
             cloudLayer2Img = ImageIO.read(cloudLayer2ImgUrl);
+            
             URL mountainsImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/mountains.png");
             mountainsImg = ImageIO.read(mountainsImgUrl);
+            
             URL groundImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/ground.png");
             groundImg = ImageIO.read(groundImgUrl);
             
@@ -177,9 +183,11 @@ public class Game {
             URL helicopterBodyImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_helicopter_body.png");
             EnemyHelicopter.helicopterBodyImg = ImageIO.read(helicopterBodyImgUrl);
             EnemyRandomHelicopter.helicopterBodyImg = ImageIO.read(helicopterBodyImgUrl);
+            
             URL helicopterFrontPropellerAnimImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_front_propeller_anim.png");
             EnemyHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
             EnemyRandomHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
+            
             URL helicopterRearPropellerAnimImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_rear_propeller_anim.png");
             EnemyHelicopter.helicopterRearPropellerAnimImg = ImageIO.read(helicopterRearPropellerAnimImgUrl);
             EnemyRandomHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
@@ -191,6 +199,7 @@ public class Game {
             // Images of rocket and its smoke.
             URL rocketImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/rocket.png");
             Rocket.rocketImg = ImageIO.read(rocketImgUrl);
+            
             URL rocketSmokeImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/rocket_smoke.png");
             RocketSmoke.smokeImg = ImageIO.read(rocketSmokeImgUrl);
             

@@ -39,12 +39,12 @@ public abstract class Canvas extends JPanel implements KeyListener, MouseListene
 		// If you will draw your own mouse cursor or if you just want that mouse cursor
 		// disapear,
 		// insert "true" into if condition and mouse cursor will be removed.
-		if (false) // mouse cursor is invisible(true)
-		{
-			BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
-			this.setCursor(blankCursor);
-		}
+//		if (cursorState) // mouse cursor is invisible(true)
+//		{
+//			BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
+//			this.setCursor(blankCursor);
+//		}
 
 		// Adds the keyboard listener to JPanel to receive key events from this
 		// component.
@@ -57,7 +57,7 @@ public abstract class Canvas extends JPanel implements KeyListener, MouseListene
 	// This method is overridden in Framework.java and is used for drawing to the
 	// screen.
 	public abstract void Draw(Graphics2D g2d);
-
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;

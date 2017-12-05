@@ -24,42 +24,43 @@ public class MainMenu {
 	private BufferedImage gameStartPressImg;
 	private BufferedImage multiStartPressImg;
 	private BufferedImage exitPressImg;
+	private BufferedImage gameStartNotPressImg;
+	private BufferedImage multiStartNotPressImg;
+	private BufferedImage exitNotPressImg;
+
 	private JButton btn;
+	protected JButton gameStartBtn;
+	protected JButton multiStartBtn;
+	protected JButton exitBtn;
 
 	@SuppressWarnings("unused")
 	private SelectMenu selectMenu;
 
-	ImageIcon gameStartNotPressImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/game_start_not_press.png"));
-	protected final JButton gameStartBtn = new JButton(gameStartNotPressImg);
-	ImageIcon multiStartNotPressImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/multi_start_not_press.png"));
-	protected final JButton multiStartBtn = new JButton(multiStartNotPressImg);
-	ImageIcon exitNotPressImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/exit_not_press.png"));
-	protected final JButton exitBtn = new JButton(exitNotPressImg);
-
 	public MainMenu() {
-		Framework.gameState = Framework.GameState.STARTING;
-
-		Thread threadForInitMainMenu = new Thread() {
-			@Override
-			public void run() {
-				// Sets variables and objects for the game.
-				Initialize();
-				// Load game files (images, sounds, ...)
-				LoadContent();
-				Framework.gameState = Framework.GameState.MAIN_MENU;
-			}
-		};
-		threadForInitMainMenu.start();
+		Initialize();
+		// Load game files (images, sounds, ...)
+		LoadContent();
+		Framework.gameState = Framework.GameState.MAIN_MENU;
+//		Thread threadForInitMainMenu = new Thread() {
+//			@Override
+//			public void run() {
+//				// Sets variables and objects for the game.
+//				Initialize();
+//				// Load game files (images, sounds, ...)
+//				LoadContent();
+//				Framework.gameState = Framework.GameState.MAIN_MENU;
+//			}
+//		};
+//		threadForInitMainMenu.start();
 	}
 
 	private void Initialize() {
-
+		gameStartBtn = new JButton();
+		multiStartBtn = new JButton();
+		exitBtn = new JButton();
 	}
 
-	public void LoadContent() {
+	private void LoadContent() {
 		try {
 			URL menuBackGroundUrl = this.getClass()
 					.getResource("/helicopterbattle/resources/images/game_menu_backgroud.jpg");
@@ -71,7 +72,19 @@ public class MainMenu {
 			URL gameTitleImgUrl = this.getClass()
 					.getResource("/helicopterbattle/resources/images/helicopter_battle_title.png");
 			gameTitleImg = ImageIO.read(gameTitleImgUrl);
-
+			
+			URL gameStartNotPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/game_start_not_press.png");
+			gameStartNotPressImg = ImageIO.read(gameStartNotPressImgUrl);
+			gameStartBtn.setIcon(new ImageIcon(gameStartNotPressImg));
+			
+			URL multiStartNotPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/multi_start_not_press.png");
+			multiStartNotPressImg = ImageIO.read(multiStartNotPressImgUrl);
+			multiStartBtn.setIcon(new ImageIcon(multiStartNotPressImg));
+			
+			URL exitNotPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/exit_not_press.png");
+			exitNotPressImg = ImageIO.read(exitNotPressImgUrl);
+			exitBtn.setIcon(new ImageIcon(exitNotPressImg));
+			
 			URL gameStartPressImgUrl = this.getClass()
 					.getResource("/helicopterbattle/resources/images/game_start_press.png");
 			gameStartPressImg = ImageIO.read(gameStartPressImgUrl);
@@ -81,13 +94,13 @@ public class MainMenu {
 			multiStartPressImg = ImageIO.read(multiStartPressImgUrl);
 
 			URL exitPressImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/exit_press.png");
-			exitPressImg = ImageIO.read(exitPressImgUrl);
+			exitPressImg = ImageIO.read(exitPressImgUrl);		
 		} catch (IOException ex) {
 			Logger.getLogger(Framework.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
-	public void UpdateMainMenu() {
+	protected void UpdateMainMenu() {
 		UpdateGameStartBtn();
 		UpdateMultiStartBtn();
 		UpdateExitBtn();
@@ -97,8 +110,7 @@ public class MainMenu {
 		gameStartBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				gameStartBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/game_start_not_press.png")));
+				gameStartBtn.setIcon(new ImageIcon(gameStartNotPressImg));
 			}
 
 			@Override
@@ -121,8 +133,7 @@ public class MainMenu {
 		multiStartBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				multiStartBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/multi_start_not_press.png")));
+				multiStartBtn.setIcon(new ImageIcon(multiStartNotPressImg));
 			}
 
 			@Override
@@ -145,8 +156,7 @@ public class MainMenu {
 		exitBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				exitBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/exit_not_press.png")));
+				exitBtn.setIcon(new ImageIcon(exitNotPressImg));
 			}
 
 			@Override
@@ -172,7 +182,7 @@ public class MainMenu {
 				null);
 	}
 
-	public JButton addMenuButton(JButton btn, int xCoordinate, int yCoordinate, int width, int height) {
+	public JButton getButton(JButton btn, int xCoordinate, int yCoordinate, int width, int height) {
 		this.btn = btn;
 		this.btn.setBounds(xCoordinate, yCoordinate, width, height);
 		this.btn.setBorderPainted(false);

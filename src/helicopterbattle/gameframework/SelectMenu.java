@@ -14,53 +14,62 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 public class SelectMenu {
-
-	private Framework framework;
-
 	private BufferedImage selectMenuImg;
-
-	ImageIcon jetSelectImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/jet_select.png"));
-	protected final JButton jetSelectBtn = new JButton(jetSelectImg);
-
-	ImageIcon heliSelectImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/helicopter_select.png"));
-	protected final JButton heliSelectBtn = new JButton(heliSelectImg);
-
-	ImageIcon heli2SelectImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/helicopter2_select.png"));
-	protected final JButton heli2SelectBtn = new JButton(heli2SelectImg);
-
-	ImageIcon airBallonSelectImg = new ImageIcon(
-			this.getClass().getResource("/helicopterbattle/resources/images/air_ballon_select.png"));
-	protected final JButton airBallonSelectBtn = new JButton(airBallonSelectImg);
-
+	private BufferedImage jetSelectImg;
+	private BufferedImage heliSelectImg;
+	private BufferedImage heli2SelectImg;
+	private BufferedImage airBallonSelectImg;
+	
+	protected JButton jetSelectBtn;
+	protected JButton heliSelectBtn;
+	protected JButton heli2SelectBtn;
+	protected JButton airBallonSelectBtn;
 	private JButton btn;
 
 	public SelectMenu() {
-		Framework.gameState = Framework.GameState.STARTING;
-
-		Thread threadForInitSelectMenu = new Thread() {
-			@Override
-			public void run() {
-				// Sets variables and objects for the game.
-				Initialize();
-				// Load game files (images, sounds, ...)
-				LoadContent();
-				Framework.gameState = Framework.GameState.SELECT_MENU;
-			}
-		};
-		threadForInitSelectMenu.start();
+		Initialize();
+		LoadContent();
+		Framework.gameState = Framework.GameState.SELECT_MENU;
+//		Thread threadForInitSelectMenu = new Thread() {
+//			@Override
+//			public void run() {
+//				// Sets variables and objects for the game.
+//				Initialize();
+//				// Load game files (images, sounds, ...)
+//				LoadContent();
+//				Framework.gameState = Framework.GameState.SELECT_MENU;
+//			}
+//		};
+//		threadForInitSelectMenu.start();
 	}
 
 	private void Initialize() {
-
+		jetSelectBtn = new JButton();
+		heliSelectBtn = new JButton();
+		heli2SelectBtn = new JButton();
+		airBallonSelectBtn = new JButton();
 	}
 
 	public void LoadContent() {
 		try {
 			URL selectMenuImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/select_menu.png");
 			selectMenuImg = ImageIO.read(selectMenuImgUrl);
+			
+			URL jetSelectImgImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/jet_select.png");
+			jetSelectImg = ImageIO.read(jetSelectImgImgUrl);
+			jetSelectBtn.setIcon(new ImageIcon(jetSelectImg));
+	
+			URL heliSelectImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/helicopter_select.png");
+			heliSelectImg = ImageIO.read(heliSelectImgUrl);
+			heliSelectBtn.setIcon(new ImageIcon(heliSelectImg));	
+			
+			URL heli2SelectImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/helicopter2_select.png");
+			heli2SelectImg = ImageIO.read(heli2SelectImgUrl);
+			heli2SelectBtn.setIcon(new ImageIcon(heli2SelectImg));
+			
+			URL airBallonSelectImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/air_ballon_select.png");
+			airBallonSelectImg = ImageIO.read(airBallonSelectImgUrl);
+			airBallonSelectBtn.setIcon(new ImageIcon(airBallonSelectImg));
 		} catch (IOException ex) {
 			Logger.getLogger(Framework.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -77,14 +86,12 @@ public class SelectMenu {
 		jetSelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				jetSelectBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/jet_select.png")));
+				jetSelectBtn.setIcon(new ImageIcon(jetSelectImg));
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// jetSelectBtn.setIcon(new
-				// ImageIcon(this.getClass().getResource("/helicopterbattle/resources/images/jet_select.png")));
+
 			}
 
 			@Override
@@ -94,7 +101,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-				framework.newGame();
+				Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
 			}
 		});
 	}
@@ -103,8 +110,7 @@ public class SelectMenu {
 		heliSelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				heliSelectBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/helicopter_select.png")));
+				heliSelectBtn.setIcon(new ImageIcon(heliSelectImg));
 			}
 
 			@Override
@@ -120,7 +126,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-				framework.newGame();
+//				newGame();
 			}
 		});
 	}
@@ -129,8 +135,7 @@ public class SelectMenu {
 		airBallonSelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				airBallonSelectBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/air_ballon_select.png")));
+				airBallonSelectBtn.setIcon(new ImageIcon(airBallonSelectImg));
 			}
 
 			@Override
@@ -146,7 +151,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-				framework.newGame();
+				//framework.newGame();
 			}
 		});
 	}
@@ -155,8 +160,7 @@ public class SelectMenu {
 		heli2SelectBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseExited(MouseEvent e) {
-				heli2SelectBtn.setIcon(new ImageIcon(
-						this.getClass().getResource("/helicopterbattle/resources/images/helicopter2_select.png")));
+				heli2SelectBtn.setIcon(new ImageIcon(heli2SelectImg));
 			}
 
 			@Override
@@ -172,7 +176,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-				framework.newGame();
+				//framework.newGame();
 			}
 		});
 	}
@@ -181,6 +185,14 @@ public class SelectMenu {
 		g2d.drawImage(selectMenuImg, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
 	}
 
+//	private void newGame() {
+//		// We set gameTime to zero and lastTime to current time for later calculations.
+//		gameTime = 0;
+//		lastTime = System.nanoTime();
+//
+//		game = new Game();
+//	}
+	
 	public JButton addMenuButton(JButton btn, int xCoordinate, int yCoordinate, int width, int height) {
 		this.btn = btn;
 		this.btn.setBounds(xCoordinate, yCoordinate, width, height);
