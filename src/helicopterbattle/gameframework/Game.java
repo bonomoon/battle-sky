@@ -23,6 +23,7 @@ import helicopterbattle.game.Bgm;
 import helicopterbattle.game.Bullet;
 import helicopterbattle.game.EnemyHelicopter;
 import helicopterbattle.game.EnemyTank;
+import helicopterbattle.game.EnemyUFO;
 import helicopterbattle.game.MovingBackground;
 import helicopterbattle.game.PlayerHelicopter;
 import helicopterbattle.game.Rocket;
@@ -55,7 +56,8 @@ public class Game {
 	private ArrayList<EnemyHelicopter> enemyHelicopterList = new ArrayList<EnemyHelicopter>();
 	// Enemy Tank.
 	private ArrayList<EnemyTank> enemyTankList = new ArrayList<EnemyTank>();
-
+	private ArrayList<EnemyUFO> enemyUFOList = new ArrayList<EnemyUFO>();
+	
 	// Explosions
 	private ArrayList<Animation> explosionsList;
 	private BufferedImage explosionAnimImg;
@@ -129,6 +131,7 @@ public class Game {
 		player = new PlayerHelicopter(Framework.frameWidth / 4, Framework.frameHeight / 4);
 
 		enemyHelicopterList = new ArrayList<EnemyHelicopter>();
+		enemyUFOList = new ArrayList<EnemyUFO>();		
 		enemyTankList = new ArrayList<EnemyTank>();
 
 		explosionsList = new ArrayList<Animation>();
@@ -171,23 +174,6 @@ public class Game {
 
 			URL groundImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/ground.png");
 			groundImg = ImageIO.read(groundImgUrl);
-
-			// Load images for enemy helicopter
-			URL helicopterBodyImgUrl = this.getClass()
-					.getResource("/helicopterbattle/resources/images/2_helicopter_body.png");
-			EnemyHelicopter.helicopterBodyImg = ImageIO.read(helicopterBodyImgUrl);
-
-			URL helicopterFrontPropellerAnimImgUrl = this.getClass()
-					.getResource("/helicopterbattle/resources/images/2_front_propeller_anim.png");
-			EnemyHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
-
-			URL helicopterRearPropellerAnimImgUrl = this.getClass()
-					.getResource("/helicopterbattle/resources/images/2_rear_propeller_anim.png");
-			EnemyHelicopter.helicopterRearPropellerAnimImg = ImageIO.read(helicopterRearPropellerAnimImgUrl);
-
-			// Load images for enemy Tank
-			URL tankImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/tank.png");
-			EnemyTank.tankBodyImg = ImageIO.read(tankImgUrl);
 
 			// Images of rocket and its smoke.
 			URL rocketImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/rocket.png");
@@ -235,6 +221,7 @@ public class Game {
 
 		// Empty all the lists.
 		enemyHelicopterList.clear();
+		enemyUFOList.clear();		
 		enemyTankList.clear();
 		bulletsList.clear();
 		rocketsList.clear();
@@ -296,9 +283,11 @@ public class Game {
 
 		/* Enemies */
 		createEnemyHelicopter(gameTime);
+		createEnemyUFO(gameTime);		
 		createEnemyTank(gameTime);
 		updateEnemyHelicopters();
 		updateEnemyTanks();
+		updateEnemyUFO();
 
 		/* Explosions */
 		updateExplosions();
@@ -327,7 +316,11 @@ public class Game {
 		for (int i = 0; i < enemyHelicopterList.size(); i++) {
 			enemyHelicopterList.get(i).Draw(g2d);
 		}
-
+		
+		// Draws all the helicopter enemies.
+		for (int i = 0; i < enemyUFOList.size(); i++) {
+			enemyUFOList.get(i).Draw(g2d);
+		}
 		// Draws all the tank enemies.
 		for (int i = 0; i < enemyTankList.size(); i++) {
 			enemyTankList.get(i).Draw(g2d);
@@ -446,25 +439,9 @@ public class Game {
 
 		newXform.rotate(alfaAngleRadians, mousePosition.x, mousePosition.y);
 		g2d.setTransform(newXform);
-
-		g2d.drawImage(mouseCursorImg, mousePosition.x, mousePosition.y - mouseCursorImg.getHeight() / 2, null); // We
-																												// substract
-																												// half
-																												// of
-																												// the
-																												// cursor
-																												// image
-																												// so
-																												// that
-																												// will
-																												// be
-																												// drawn
-																												// in
-																												// center
-																												// of
-																												// the y
-																												// mouse
-																												// coordinate.
+		// We substract half of the cursor image
+		// so that will be drawn in center of the y mouse coordinate.
+		g2d.drawImage(mouseCursorImg, mousePosition.x, mousePosition.y - mouseCursorImg.getHeight() / 2, null); 
 
 		g2d.setTransform(origXform);
 	}
@@ -575,6 +552,24 @@ public class Game {
 		}
 	}
 
+	private void createEnemyUFO(long gameTime) {
+		if (gameTime - EnemyUFO.timeOfLastCreatedEnemy >= EnemyUFO.timeBetweenNewEnemies) {
+			EnemyUFO eu = new EnemyUFO();
+			int xCoordinate = Framework.frameWidth;
+			int yCoordinate = random
+					.nextInt(Framework.frameHeight - (EnemyUFO.ufoBodyImg.getHeight()) * 3);
+			eu.Initialize(xCoordinate, yCoordinate);
+			// Add created enemy to the list of enemies.
+			enemyUFOList.add(eu);
+
+			// Speed up enemy speed and aperence.
+			EnemyUFO.speedUp();
+
+			// Sets new time for last created enemy.
+			EnemyUFO.timeOfLastCreatedEnemy = gameTime;
+		}
+	}
+	
 	private void createEnemyTank(long gameTime) {
 		if (gameTime - EnemyTank.timeOfLastCreatedEnemy >= EnemyTank.timeBetweenNewEnemies) {
 			EnemyTank et = new EnemyTank();
@@ -677,6 +672,83 @@ public class Game {
 		enemyHelicopterList.remove(enemyNum);
 	}
 
+	private void updateEnemyUFO() {
+		for (int i = 0; i < enemyUFOList.size(); i++) {
+			EnemyUFO eu = enemyUFOList.get(i);
+
+			eu.Update();
+			if(isCrashedPlayer(eu, i)) {
+				break;
+			}
+			if (eu.health <= 0) {
+				checkHealth(eu, i);
+				Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
+				ExplosionBgm.start();
+				continue; // Helicopter was destroyed so we can move to next helicopter.
+			}
+			// If the current enemy is left the screen we remove him from the list and
+			// update the runAwayEnemies variable.
+			if (eu.isLeftScreen()) {
+				enemyUFOList.remove(i);
+				runAwayEnemies++;
+			}
+		}
+	}
+
+	private boolean isCrashedPlayer(EnemyUFO eu, int enemyNum) {
+		// Is crashed with player?
+		Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate,
+				player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
+		Rectangle enemyRectangel = new Rectangle(eu.xCoordinate, eu.yCoordinate,
+				EnemyUFO.ufoBodyImg.getWidth(), EnemyUFO.ufoBodyImg.getHeight());
+		if (playerRectangel.intersects(enemyRectangel)) {
+			player.health -= 50;
+			Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
+			ExplosionBgm.start();
+			// Remove helicopter from the list.
+			enemyUFOList.remove(enemyNum);
+
+			// Add explosion of player helicopter.
+			for (int exNum = 0; exNum < 3; exNum++) {
+				Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false,
+						player.xCoordinate + exNum * 60, player.yCoordinate - random.nextInt(100),
+						exNum * 200 + random.nextInt(100));
+				explosionsList.add(expAnim);
+			}
+			// Add explosion of enemy helicopter.
+			for (int exNum = 0; exNum < 3; exNum++) {
+				Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false,
+						eu.xCoordinate + exNum * 60, eu.yCoordinate - random.nextInt(100),
+						exNum * 200 + random.nextInt(100));
+				explosionsList.add(expAnim);
+			}
+
+			// Because player crashed with enemy the game will be over so we don't need to
+			// check other enemies.
+			if (player.health <= 0) {
+				gameOver.start();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void checkHealth(EnemyUFO eu, int enemyNum) {
+		// Add explosion of helicopter.
+		Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eu.xCoordinate,
+				eu.yCoordinate - explosionAnimImg.getHeight() / 3, 0);
+		// Substring 1/3 explosion image height
+		// (explosionAnimImg.getHeight()/3) so that
+		// explosion is drawn more at the center of the helicopter.					
+		explosionsList.add(expAnim);
+
+		// Increase the destroyed enemies counter.
+		destroyedEnemies++;
+
+		// Remove helicopter from the list.
+		enemyUFOList.remove(enemyNum);
+	}
+	
 	private void updateEnemyTanks() {
 		for (int i = 0; i < enemyTankList.size(); i++) {
 			EnemyTank et = enemyTankList.get(i);

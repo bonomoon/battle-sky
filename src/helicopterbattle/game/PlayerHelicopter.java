@@ -21,15 +21,15 @@ import helicopterbattle.gameframework.Game.FlightState;
  * @author www.gametutorial.net
  */
 
-public class PlayerHelicopter implements Player {
+public class PlayerHelicopter {
     
     // Health of the helicopter.
     private final int healthInit = 300;
     public int health;
     
     // Position of the helicopter on the screen.
-    public static int xCoordinate;
-    public static int yCoordinate;
+    public int xCoordinate;
+    public int yCoordinate;
     
     // Moving speed and also direction.
     private double movingXspeed;
@@ -173,11 +173,6 @@ public class PlayerHelicopter implements Player {
         helicopterRearPropellerAnim = new Animation(helicopterRearPropellerAnimImg, 54, 54, 4, 20, true, xCoordinate + offsetXRearPropeller, yCoordinate + offsetYRearPropeller, 0);
     }
     
-    
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#Reset(int, int)
-	 */
-    @Override
 	public void Reset(int xCoordinate, int yCoordinate)
     {
         this.health = healthInit;
@@ -195,11 +190,6 @@ public class PlayerHelicopter implements Player {
         this.movingYspeed = 0;
     }
     
-    
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#isShooting(long)
-	 */
-    @Override
 	public boolean isShooting(long gameTime)
     {
         // Checks if left mouse button is down && if it is the time for a new bullet.
@@ -212,11 +202,6 @@ public class PlayerHelicopter implements Player {
             return false;
     }
     
-    
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#isFiredRocket(long)
-	 */
-    @Override
 	public boolean isFiredRocket(long gameTime)
     {
         // Checks if right mouse button is down && if it is the time for new rocket && if he has any rocket left.
@@ -230,10 +215,6 @@ public class PlayerHelicopter implements Player {
     }
     
     
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#isMoving()
-	 */
-    @Override
 	public void isMoving()
     {
         // Moving on the x coordinate.
@@ -258,18 +239,7 @@ public class PlayerHelicopter implements Player {
             else if(movingYspeed > 0)
                 movingYspeed -= stoppingYspeed;
     }
-//    
-//    if(username != null) {
-//        JTextArea txtrUsername = new JTextArea();
-//        txtrUsername.setFont(new Font("Monospaced", Font.BOLD, 14));
-//        txtrUsername.setBackground(null);
-//        txtrUsername.setText(username);
-//        add(txtrUsername);
-//    }
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#Update()
-	 */
-    @Override
+
 	public void Update()
     {
         // Move helicopter and its propellers.
@@ -287,10 +257,6 @@ public class PlayerHelicopter implements Player {
         this.machineGunYcoordinate = this.yCoordinate + this.offsetYMachineGun;
     }
     
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#IsPropeller(helicopterbattle.gameframework.Game.FlightState)
-	 */
-    @Override
 	public boolean IsPropeller(Game.FlightState flightState) {
     	if(flightState == FlightState.HELICOPTER1 || flightState == FlightState.HELICOPTER2)
     		return true;
@@ -298,10 +264,7 @@ public class PlayerHelicopter implements Player {
     		
     		return false;
     }
-    /* (non-Javadoc)
-	 * @see helicopterbattle.game.Player#Draw(java.awt.Graphics2D)
-	 */
-    @Override
+
 	public void Draw(Graphics2D g2d)
     {
     	if(IsPropeller(Game.flightState)) {

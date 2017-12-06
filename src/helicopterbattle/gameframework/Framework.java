@@ -59,7 +59,7 @@ public class Framework extends Canvas {
 	/**
 	 * Elapsed game time in nanoseconds.
 	 */
-	private long gameTime;
+	public static long gameTime;
 	// It is used for calculating elapsed time.
 	private long lastTime;
 
@@ -101,7 +101,23 @@ public class Framework extends Canvas {
 	/**
 	 * In specific intervals of time (GAME_UPDATE_PERIOD) the game/logic is updated
 	 * and then the game is drawn on the screen.
+	 * @throws InterruptedException 
 	 */
+//	public void Splash() throws InterruptedException{
+//		JSplash sp = new JSplash(this.getClass().getResource("game_menu_background.jpg"), true, true, false, "V1", null, Color.BLUE, Color.BLACK);
+//		sp.splashOn();
+//		sp.setProgress(20, "init");
+//		Thread.sleep(1000);
+//		sp.setProgress(40, "Loading");
+//		Thread.sleep(1000);
+//		sp.setProgress(60, "Apprying Configs");
+//		Thread.sleep(1000);
+//		sp.setProgress(80, "Starting App");
+//		Thread.sleep(1000);
+//		sp.splashOff();
+//		gameState = GameState.VISUALIZING;
+//	}
+	
 	private void GameLoop() {
 		// This two variables are used in VISUALIZING state of the game. We used them to
 		// wait some time so that we get correct frame/window resolution.
@@ -121,6 +137,17 @@ public class Framework extends Canvas {
 				lastTime = System.nanoTime();
 				break;
 			case GAMEOVER:
+				if (JOptionPane.showConfirmDialog(this, " 랭킹을 등록하시겠습니까?? ") == 0) {
+					setCursor(false);
+					try {
+						new RankView();
+						Thread.sleep(100000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				else
+					restartGame();
 				break;
 			case MULTI_MENU:
 				if (JOptionPane.showConfirmDialog(this, "Do you want to run the server") == 0) {
@@ -232,7 +259,7 @@ public class Framework extends Canvas {
 		g2d.drawString("GAME is LOADING", frameWidth / 2 - 50, frameHeight / 2);		
 	}
 	private void drawGameOver(Graphics2D g2d) {
-		g2d.setColor(Color.black);
+		g2d.setColor(Color.white);
 		g2d.drawString("Press ENTER to restart or ESC to exit.", frameWidth / 2 - 113, frameHeight / 4 + 30);
 		game.DrawStatistic(g2d, gameTime);
 		g2d.setFont(font);
@@ -284,14 +311,6 @@ public class Framework extends Canvas {
 		}
 	}
 
-//	private void setCursor(boolean cursorState) {
-//		if (cursorState) // mouse cursor is invisible(true)
-//		{
-//			BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-//			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
-//			this.setCursor(blankCursor);
-//		}
-//	}
 	/**
 	 * This method is called when keyboard key is released.
 	 * 

@@ -1,10 +1,14 @@
 package helicopterbattle.game;
 
 import java.awt.Graphics2D;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import helicopterbattle.gameframework.Canvas;
+import javax.imageio.ImageIO;
+
 import helicopterbattle.gameframework.Framework;
 
 /**
@@ -37,7 +41,9 @@ public class EnemyTank {
     private final int numberOfAmmoInit = 10;
     public int numberOfAmmo;
     
-    
+    public EnemyTank() {
+    	LoadContent();
+    }
     /**
      * Initialize enemy Tank.
      * 
@@ -57,6 +63,17 @@ public class EnemyTank {
         EnemyTank.movingXspeed = -1;
     }
     
+    private void LoadContent()
+    {
+        try {
+			// Load images for enemy Tank
+			URL tankImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/tank.png");
+			EnemyTank.tankBodyImg = ImageIO.read(tankImgUrl);
+        } 
+        catch (IOException ex) {
+            Logger.getLogger(PlayerHelicopter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     /**
      * It sets speed and time between enemies to the initial properties.
      */
@@ -75,15 +92,7 @@ public class EnemyTank {
         
         EnemyTank.movingXspeed -= 0.25;
     }
-    
-//    public boolean isFiredRocket()
-//    {
-//        // Checks if right mouse button is down && if it is the time for new rocket && if he has any rocket left.
-//        if( this.xCoordinate == Framework.frameWidth/2) {
-//            return true;
-//        } else
-//            return false;
-//    }
+
     public boolean isShootingTime(long gameTime)
     {
        if ( ((gameTime - Bullet.timeOfLastCreatedEnemyBullet) >= Bullet.timeBetweenNewBullets) && this.numberOfAmmo >= 0 ) // 미사일 개수가 0 이상일 경우 

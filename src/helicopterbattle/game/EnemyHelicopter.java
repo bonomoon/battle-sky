@@ -2,6 +2,12 @@ package helicopterbattle.game;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 import helicopterbattle.gameframework.Framework;
 
@@ -14,7 +20,7 @@ import helicopterbattle.gameframework.Framework;
 public class EnemyHelicopter {
     
     // For creating new enemies.
-    private static final long timeBetweenNewEnemiesInit = Framework.secInNanosec * 3;
+    private static final long timeBetweenNewEnemiesInit = Framework.secInNanosec * 2;
     public static long timeBetweenNewEnemies = timeBetweenNewEnemiesInit;
     public static long timeOfLastCreatedEnemy = 0;
     
@@ -26,7 +32,7 @@ public class EnemyHelicopter {
     public int yCoordinate;
     
     // Moving speed and direction.
-    private static final double movingXspeedInit = -4;
+    private static final double movingXspeedInit = (double) (Math.random() * (2 - (1) + 1)) + 1;
     private static double movingXspeed = movingXspeedInit;
     private static double movingYspeed;
     // Images of enemy helicopter. Images are loaded and set in Game class in LoadContent() method.
@@ -53,6 +59,35 @@ public class EnemyHelicopter {
      * @param helicopterFrontPropellerAnimImg Image of front helicopter propeller.
      * @param helicopterRearPropellerAnimImg Image of rear helicopter propeller.
      */
+    public EnemyHelicopter() {
+        LoadContent();
+    }
+    private void LoadContent()
+    {
+        try 
+        {
+			// Load images for enemy helicopter
+			URL helicopterBodyImgUrl = this.getClass()
+					.getResource("/helicopterbattle/resources/images/2_helicopter_body.png");
+			helicopterBodyImg = ImageIO.read(helicopterBodyImgUrl);
+
+			URL helicopterFrontPropellerAnimImgUrl = this.getClass()
+					.getResource("/helicopterbattle/resources/images/2_front_propeller_anim.png");
+			helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
+
+			URL helicopterRearPropellerAnimImgUrl = this.getClass()
+					.getResource("/helicopterbattle/resources/images/2_rear_propeller_anim.png");
+			helicopterRearPropellerAnimImg = ImageIO.read(helicopterRearPropellerAnimImgUrl);
+        } 
+        catch (IOException ex) {
+            Logger.getLogger(PlayerHelicopter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        // Now that we have images of propeller animation we initialize animation object.
+        helicopterFrontPropellerAnim = new Animation(helicopterFrontPropellerAnimImg, 204, 34, 3, 20, true, xCoordinate + offsetXFrontPropeller, yCoordinate + offsetYFrontPropeller, 0);
+        helicopterRearPropellerAnim = new Animation(helicopterRearPropellerAnimImg, 54, 54, 4, 20, true, xCoordinate + offsetXRearPropeller, yCoordinate + offsetYRearPropeller, 0);
+    }
+    
     public void Initialize(int xCoordinate, int yCoordinate)
     {
         health = 100;

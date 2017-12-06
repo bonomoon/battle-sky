@@ -52,7 +52,7 @@ public class GameServer extends Thread {
 				System.out.println("["+address.getHostAddress()+":"+port+"]"+packet.getUserName()+" has connected...");
 				PlayerHelicopterMP player = null;
 				if(address.getHostAddress().equalsIgnoreCase("localhost")) {
-					player = new PlayerHelicopterMP(PlayerHelicopter.xCoordinate, PlayerHelicopter.yCoordinate, packet.getUserName(), address, port);	
+//					player = new PlayerHelicopterMP(PlayerHelicopter.xCoordinate, PlayerHelicopter.yCoordinate, packet.getUserName(), address, port);	
 				}
 				if(player != null) {
 					this.connectedPlayers.add(player);
