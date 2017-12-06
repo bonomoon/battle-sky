@@ -47,11 +47,9 @@ public class Game {
     public static enum FlightState{HELICOPTER1, HELICOPTER2, JETPLANE, AIRBALLOON}
     public static FlightState flightState;
     private PlayerHelicopter player;
-    private PlayerHelicopter multiPlayer;
     
     // Enemy helicopters.
     private ArrayList<EnemyHelicopter> enemyHelicopterList = new ArrayList<EnemyHelicopter>();
-
     // Enemy Tank.
     private ArrayList<EnemyTank> enemyTankList = new ArrayList<EnemyTank>();
     
@@ -309,24 +307,16 @@ public class Game {
      * 
      * @param g2d Graphics2D
      * @param mousePosition current mouse position.
-     */
+     */ 
 	public void Draw(Graphics2D g2d, Point mousePosition, long gameTime) {
-        // Image for background sky color.
-        g2d.drawImage(skyColorImg, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
-        
-        // Moving images.
-        mountainsMoving.Draw(g2d);
-        groundMoving.Draw(g2d);
-        cloudLayer2Moving.Draw(g2d);
-        
-        if(isPlayerAlive())
+		drawGameBackGround(g2d);
+		drawGameMovingImg(g2d);
+		
+        if(isPlayerAlive()) {
             player.Draw(g2d);
-        	g2d.setColor(Color.red);
-            g2d.fillRoundRect(5, 150, player.health, 50, 30, 30);
-            
-            
-            g2d.setColor(Color.black);
-            g2d.drawRoundRect(5, 150, 300, 50, 30, 30);
+            cloudLayer1Moving.Draw(g2d);  // Moving images. We draw this cloud in front of the helicopter.
+            drawHealthBar(g2d);
+        }
         
         // Draws all the helicopter enemies.
         for(int i = 0; i < enemyHelicopterList.size(); i++) {
@@ -358,6 +348,33 @@ public class Game {
 			explosionsList.get(i).Draw(g2d);
 		}
         
+		drawGameStatistics(g2d, gameTime);
+		
+        // Mouse cursor
+        if(isPlayerAlive())
+            drawRotatedMouseCursor(g2d, mousePosition);
+    }
+	
+    private void drawGameBackGround(Graphics2D g2d) {
+        // Image for background sky color.
+        g2d.drawImage(skyColorImg, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
+    }
+    
+    private void drawGameMovingImg(Graphics2D g2d) {
+        // Moving images.
+        mountainsMoving.Draw(g2d);
+        groundMoving.Draw(g2d);
+        cloudLayer2Moving.Draw(g2d);    	
+    }
+    
+    private void drawHealthBar(Graphics2D g2d) {
+    	g2d.setColor(Color.red);
+        g2d.fillRoundRect(5, 150, player.health, 50, 30, 30);
+        g2d.setColor(Color.black);
+        g2d.drawRoundRect(5, 150, 300, 50, 30, 30);    	
+    }
+    
+    private void drawGameStatistics(Graphics2D g2d, long gameTime) {
         // Draw statistics
         g2d.setFont(font);
         g2d.setColor(Color.darkGray);
@@ -367,13 +384,6 @@ public class Game {
         g2d.drawString("RUNAWAY: "   + runAwayEnemies,   10, 41);
         g2d.drawString("ROCKETS: "   + player.numberOfRockets, 10, 81);
         g2d.drawString("AMMO: "      + player.numberOfAmmo, 10, 101);
-        
-        // Moving images. We draw this cloud in front of the helicopter.
-        cloudLayer1Moving.Draw(g2d);
-        
-        // Mouse cursor
-        if(isPlayerAlive())
-            drawRotatedMouseCursor(g2d, mousePosition);
     }
     
     /**
@@ -560,7 +570,7 @@ public class Game {
      * Checks if enemy was destroyed.
      * Checks if any enemy collision with player.
      */
-    private void isCrashed(EnemyHelicopter eh, int enemyNum) {
+    private void crashedPlayer(EnemyHelicopter eh, int enemyNum) {
         // Is crashed with player?
         Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
         Rectangle enemyRectangel = new Rectangle(eh.xCoordinate, eh.yCoordinate, EnemyHelicopter.helicopterBodyImg.getWidth(), EnemyHelicopter.helicopterBodyImg.getHeight());
@@ -586,13 +596,9 @@ public class Game {
             	gameOver.start();
             }
         }
-        
     }
     
 	private void checkHealth(EnemyHelicopter eh, int enemyNum) {
-		// Check health.
-		Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
-		ExplosionBgm.start();
 		// Add explosion of helicopter.
 		Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eh.xCoordinate,
 				eh.yCoordinate - explosionAnimImg.getHeight() / 3, 0); // Substring 1/3 explosion image height
@@ -606,8 +612,6 @@ public class Game {
 
 		// Remove helicopter from the list.
 		enemyHelicopterList.remove(enemyNum);
-
-		// Helicopter was destroyed so we can move to next helicopter.
 	}
 	
     private void updateEnemyHelicopters() {
@@ -615,10 +619,12 @@ public class Game {
             EnemyHelicopter eh = enemyHelicopterList.get(i);
 
             eh.Update();
-            isCrashed(eh, i);
+            crashedPlayer(eh, i);
             if(eh.health <= 0) {
-            	checkHealth(eh, i);
-            	continue;
+        		Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
+        		ExplosionBgm.start();
+            	checkHealth(eh, i); 
+            	continue; // Helicopter was destroyed so we can move to next helicopter.
             }
             // If the current enemy is left the screen we remove him from the list and update the runAwayEnemies variable.
 			if (eh.isLeftScreen()) {
