@@ -560,40 +560,38 @@ public class Game {
      * Checks if enemy was destroyed.
      * Checks if any enemy collision with player.
      */
-    private void isCrashed(EnemyHelicopter eh, int enemyNum) {
-        // Is crashed with player?
-        Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
-        Rectangle enemyRectangel = new Rectangle(eh.xCoordinate, eh.yCoordinate, EnemyHelicopter.helicopterBodyImg.getWidth(), EnemyHelicopter.helicopterBodyImg.getHeight());
-        if(playerRectangel.intersects(enemyRectangel)) {
-            player.health -= 100;
-            
-            // Remove helicopter from the list.
-            enemyHelicopterList.remove(enemyNum);
-            
-            // Add explosion of player helicopter.
-            for(int exNum = 0; exNum < 3; exNum++) {
-                Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, player.xCoordinate + exNum*60, player.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
-                explosionsList.add(expAnim);
-            }
-            // Add explosion of enemy helicopter.
-            for(int exNum = 0; exNum < 3; exNum++) {
-                Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eh.xCoordinate + exNum*60, eh.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
-                explosionsList.add(expAnim);
-            }
-            
-            // Because player crashed with enemy the game will be over so we don't need to check other enemies.
-            if(player.health <= 0) {
-            	gameOver.start();
-            }
-        }
-    }
-    
     private void updateEnemyHelicopters() {
 		for (int i = 0; i < enemyHelicopterList.size(); i++) {
             EnemyHelicopter eh = enemyHelicopterList.get(i);
 
             eh.Update();
-            isCrashed(eh, i);
+            
+            // Is chrashed with player?
+            Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
+            Rectangle enemyRectangel = new Rectangle(eh.xCoordinate, eh.yCoordinate, EnemyHelicopter.helicopterBodyImg.getWidth(), EnemyHelicopter.helicopterBodyImg.getHeight());
+            if(playerRectangel.intersects(enemyRectangel)) {
+                player.health -= 100;
+                
+                // Remove helicopter from the list.
+                enemyHelicopterList.remove(i);
+                
+                // Add explosion of player helicopter.
+                for(int exNum = 0; exNum < 3; exNum++) {
+                    Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, player.xCoordinate + exNum*60, player.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
+                    explosionsList.add(expAnim);
+                }
+                // Add explosion of enemy helicopter.
+                for(int exNum = 0; exNum < 3; exNum++) {
+                    Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eh.xCoordinate + exNum*60, eh.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
+                    explosionsList.add(expAnim);
+                }
+                
+                // Because player crashed with enemy the game will be over so we don't need to check other enemies.
+                if(player.health <= 0) {
+                	gameOver.start();
+                }
+                break;
+            }
             
             // Check health.
             if(eh.health <= 0) {
@@ -619,6 +617,7 @@ public class Game {
                 runAwayEnemies++;
             }
         }
+		
 	}
 
 
