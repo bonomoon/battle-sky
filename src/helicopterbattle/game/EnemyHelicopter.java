@@ -14,7 +14,7 @@ import helicopterbattle.gameframework.Framework;
 public class EnemyHelicopter {
     
     // For creating new enemies.
-    private static final long timeBetweenNewEnemiesInit = Framework.secInNanosec * 4;
+    private static final long timeBetweenNewEnemiesInit = Framework.secInNanosec * 3;
     public static long timeBetweenNewEnemies = timeBetweenNewEnemiesInit;
     public static long timeOfLastCreatedEnemy = 0;
     
@@ -67,7 +67,7 @@ public class EnemyHelicopter {
        
         // Moving speed and direction of enemy.
         EnemyHelicopter.movingXspeed = -4;
-        EnemyHelicopter.movingYspeed = movingYspeed = (int) (Math.random() * (4 - (-4) + 1)) - 4;
+        EnemyHelicopter.movingYspeed = (int) (Math.random() * (2 - (-2) + 1)) - 2;
     }
     
     /**
@@ -112,7 +112,7 @@ public class EnemyHelicopter {
     {
         // Move enemy on x coordinate.
         xCoordinate += movingXspeed;
-	    //yCoordinate += movingYspeed;
+	    yCoordinate += movingYspeed;
         // Moves helicoper propeler animations with helicopter.
         helicopterFrontPropellerAnim.changeCoordinates(xCoordinate + offsetXFrontPropeller, yCoordinate + offsetYFrontPropeller);
         helicopterRearPropellerAnim.changeCoordinates(xCoordinate + offsetXRearPropeller, yCoordinate + offsetYRearPropeller);

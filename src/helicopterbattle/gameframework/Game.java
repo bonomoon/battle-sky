@@ -22,7 +22,6 @@ import helicopterbattle.game.Animation;
 import helicopterbattle.game.Bgm;
 import helicopterbattle.game.Bullet;
 import helicopterbattle.game.EnemyHelicopter;
-import helicopterbattle.game.EnemyRandomHelicopter;
 import helicopterbattle.game.EnemyTank;
 import helicopterbattle.game.MovingBackground;
 import helicopterbattle.game.PlayerHelicopter;
@@ -52,10 +51,7 @@ public class Game {
     
     // Enemy helicopters.
     private ArrayList<EnemyHelicopter> enemyHelicopterList = new ArrayList<EnemyHelicopter>();
-    
-    // Enemy Random helicopters.
-    private ArrayList<EnemyRandomHelicopter> enemyRandomList = new ArrayList<EnemyRandomHelicopter>();
-    
+
     // Enemy Tank.
     private ArrayList<EnemyTank> enemyTankList = new ArrayList<EnemyTank>();
     
@@ -135,7 +131,6 @@ public class Game {
         player = new PlayerHelicopter(Framework.frameWidth / 4, Framework.frameHeight / 4);
         
         enemyHelicopterList = new ArrayList<EnemyHelicopter>();
-        enemyRandomList = new ArrayList<EnemyRandomHelicopter>();
         enemyTankList = new ArrayList<EnemyTank>();
         
         explosionsList = new ArrayList<Animation>();
@@ -182,16 +177,13 @@ public class Game {
             // Load images for enemy helicopter
             URL helicopterBodyImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_helicopter_body.png");
             EnemyHelicopter.helicopterBodyImg = ImageIO.read(helicopterBodyImgUrl);
-            EnemyRandomHelicopter.helicopterBodyImg = ImageIO.read(helicopterBodyImgUrl);
-            
+         
             URL helicopterFrontPropellerAnimImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_front_propeller_anim.png");
             EnemyHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
-            EnemyRandomHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
-            
+       
             URL helicopterRearPropellerAnimImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/2_rear_propeller_anim.png");
             EnemyHelicopter.helicopterRearPropellerAnimImg = ImageIO.read(helicopterRearPropellerAnimImgUrl);
-            EnemyRandomHelicopter.helicopterFrontPropellerAnimImg = ImageIO.read(helicopterFrontPropellerAnimImgUrl);
-            
+
             // Load images for enemy Tank
             URL tankImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/tank.png");
             EnemyTank.tankBodyImg = ImageIO.read(tankImgUrl);
@@ -234,7 +226,6 @@ public class Game {
 		player.Reset(Framework.frameWidth / 4, Framework.frameHeight / 4);
 
 		EnemyHelicopter.restartEnemy();
-		EnemyRandomHelicopter.restartEnemy();
 		EnemyTank.restartEnemy();
 
 		Bullet.timeOfLastCreatedBullet = 0;
@@ -242,7 +233,6 @@ public class Game {
 
 		// Empty all the lists.
 		enemyHelicopterList.clear();
-		enemyRandomList.clear();
 		enemyTankList.clear();
 		bulletsList.clear();
 		rocketsList.clear();
@@ -305,7 +295,6 @@ public class Game {
         
         /* Enemies */
         createEnemyHelicopter(gameTime);
-        createEnemyRandom(gameTime);
         createEnemyTank(gameTime);
         updateEnemies();
         
@@ -342,12 +331,7 @@ public class Game {
         for(int i = 0; i < enemyHelicopterList.size(); i++) {
             enemyHelicopterList.get(i).Draw(g2d);
         }
-        
-        // Draws all the Random enemies.
-        for(int i = 0; i < enemyRandomList.size(); i++) {
-            enemyRandomList.get(i).Draw(g2d);
-        }
-        
+
         // Draws all the tank enemies.        
         for(int i = 0; i < enemyTankList.size(); i++) {
         	enemyTankList.get(i).Draw(g2d);
@@ -573,23 +557,6 @@ public class Game {
         }
     }
     
-    private void createEnemyRandom(long gameTime) {
-        if(gameTime - EnemyRandomHelicopter.timeOfLastCreatedEnemy >= EnemyRandomHelicopter.timeBetweenNewEnemies) {
-            EnemyRandomHelicopter er = new EnemyRandomHelicopter();
-            int xCoordinate = Framework.frameWidth;
-            int yCoordinate = random.nextInt(Framework.frameHeight - (EnemyRandomHelicopter.helicopterBodyImg.getHeight())*5);
-            er.Initialize(xCoordinate, yCoordinate);
-            // Add created enemy to the list of enemies.
-            enemyRandomList.add(er);
-            
-            // Speed up enemy speed and aperence.
-            EnemyRandomHelicopter.speedUp();
-            
-            // Sets new time for last created enemy.
-            EnemyRandomHelicopter.timeOfLastCreatedEnemy = gameTime;
-        }
-    }
-    
     private void createEnemyTank(long gameTime) {
         if(gameTime - EnemyTank.timeOfLastCreatedEnemy >= EnemyTank.timeBetweenNewEnemies) {
             EnemyTank et= new EnemyTank();
@@ -671,61 +638,6 @@ public class Game {
             // If the current enemy is left the screen we remove him from the list and update the runAwayEnemies variable.
 			if (eh.isLeftScreen()) {
                 enemyHelicopterList.remove(i);
-                runAwayEnemies++;
-            }
-        }
-		
-		for (int i = 0; i < enemyRandomList.size(); i++) {
-            EnemyRandomHelicopter er = enemyRandomList.get(i);
-            
-            er.Update();
-            
-            // Is chrashed with player?
-            Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
-            Rectangle enemyRectangel = new Rectangle(er.xCoordinate, er.yCoordinate, EnemyRandomHelicopter.helicopterBodyImg.getWidth(), EnemyRandomHelicopter.helicopterBodyImg.getHeight());
-            if(playerRectangel.intersects(enemyRectangel)) {
-                player.health = 0;
-                
-                // Remove helicopter from the list.
-                enemyRandomList.remove(i);
-                
-                // Add explosion of player helicopter.
-                for(int exNum = 0; exNum < 3; exNum++) {
-                    Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, player.xCoordinate + exNum*60, player.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
-                    explosionsList.add(expAnim);
-                }
-                // Add explosion of enemy helicopter.
-                for(int exNum = 0; exNum < 3; exNum++) {
-                    Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, er.xCoordinate + exNum*60, er.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
-                    explosionsList.add(expAnim);
-                }
-                
-                // Because player crashed with enemy the game will be over so we don't need to check other enemies.
-                gameOver.start();
-                break;
-            }
-            
-            // Check health.
-            if(er.health <= 0) {
-            	Bgm ExplosionBgm = new Bgm("explosion.mp3",false);
-            	ExplosionBgm.start();
-                // Add explosion of helicopter.
-                Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, er.xCoordinate, er.yCoordinate - explosionAnimImg.getHeight()/3, 0); // Substring 1/3 explosion image height (explosionAnimImg.getHeight()/3) so that explosion is drawn more at the center of the helicopter.
-                explosionsList.add(expAnim);
-
-                // Increase the destroyed enemies counter.
-                destroyedEnemies++;
-                
-                // Remove helicopter from the list.
-                enemyRandomList.remove(i);
-                
-                // Helicopter was destroyed so we can move to next helicopter.
-                continue;
-            }
-            
-            // If the current enemy is left the screen we remove him from the list and update the runAwayEnemies variable.
-			if (er.isLeftScreen()) {
-                enemyRandomList.remove(i);
                 runAwayEnemies++;
             }
         }
@@ -842,26 +754,6 @@ public class Game {
 				if (bulletRectangle.intersects(enemyRectangel)) {
 					// Bullet hit the enemy so we reduce his health.
 					eh.health -= Bullet.damagePower;
-
-					// Bullet was also destroyed so we remove it.
-					bulletsList.remove(i);
-
-					// That bullet hit enemy so we don't need to check other enemies.
-					break;
-				}
-			}
-            
-			for (int j = 0; j < enemyRandomList.size(); j++) {
-				EnemyRandomHelicopter er = enemyRandomList.get(j);
-
-				// Current enemy rectangle.
-				Rectangle enemyRectangel = new Rectangle(er.xCoordinate, er.yCoordinate,
-						EnemyRandomHelicopter.helicopterBodyImg.getWidth(), EnemyRandomHelicopter.helicopterBodyImg.getHeight());
-
-				// Is current bullet over currnet enemy?
-				if (bulletRectangle.intersects(enemyRectangel)) {
-					// Bullet hit the enemy so we reduce his health.
-					er.health -= Bullet.damagePower;
 
 					// Bullet was also destroyed so we remove it.
 					bulletsList.remove(i);
