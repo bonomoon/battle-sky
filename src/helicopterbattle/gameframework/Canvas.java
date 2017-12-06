@@ -1,12 +1,16 @@
 package helicopterbattle.gameframework;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -49,11 +53,18 @@ public abstract class Canvas extends JPanel implements KeyListener, MouseListene
 		// component.
 		this.addMouseListener(this);
 	}
-
+	public void setCursor(boolean cursorState) {
+		if (cursorState) // mouse cursor is invisible(true)
+		{
+			BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
+			this.setCursor(blankCursor);
+		}
+	}
 	// This method is overridden in Framework.java and is used for drawing to the
 	// screen.
 	public abstract void Draw(Graphics2D g2d);
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;

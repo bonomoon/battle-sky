@@ -1,11 +1,9 @@
 package helicopterbattle.gameframework;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -77,10 +75,6 @@ public class Framework extends Canvas {
 
 	private Font font;
 
-	// Images for menu.
-	private BufferedImage menuBackGround;
-	private BufferedImage menuBorderImg;
-
 	public Framework() {
 		super();
 
@@ -117,21 +111,13 @@ public class Framework extends Canvas {
 		font = new Font("monospaced", Font.BOLD, 28);
 	}
 
-	/**
-	 * Load files (images). This method is intended to load files for this class,
-	 * files for the actual game can be loaded in Game.java.
-	 */
-	private void LoadContent() {
-		try {
-			URL menuBackGroundUrl = this.getClass()
-					.getResource("/helicopterbattle/resources/images/game_menu_backgroud.jpg");
-			menuBackGround = ImageIO.read(menuBackGroundUrl);
-			URL menuBorderImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/menu_border.png");
-			menuBorderImg = ImageIO.read(menuBorderImgUrl);
-		} catch (IOException e) {	
-			e.printStackTrace();
-		}
-	}
+//	/**
+//	 * Load files (images). This method is intended to load files for this class,
+//	 * files for the actual game can be loaded in Game.java.
+//	 */
+//	private void LoadContent() {
+//
+//	}
 
 	/**
 	 * In specific intervals of time (GAME_UPDATE_PERIOD) the game/logic is updated
@@ -235,11 +221,10 @@ public class Framework extends Canvas {
 			game.Draw(g2d, mousePosition(), gameTime);
 			break;
 		case GAMEOVER:
-			drawMenuBackground(g2d);
 			drawGameOver(g2d);
 			break;
 		case MULTI_MENU:
-			drawMenuBackground(g2d);
+			mainMenu.Draw(g2d);
 			break;
 		case MAIN_MENU:
 			mainMenu.Draw(g2d);
@@ -266,11 +251,6 @@ public class Framework extends Canvas {
 		default:
 			break;
 		}
-	}
-
-	private void drawMenuBackground(Graphics2D g2d) {
-		g2d.drawImage(menuBackGround, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
-		g2d.drawImage(menuBorderImg, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
 	}
 	
 	private void drawGameContentLoading(Graphics2D g2d) {
@@ -300,16 +280,16 @@ public class Framework extends Canvas {
 	 * Restart game - reset game time and call RestartGame() method of game object
 	 * so that reset some variables.
 	 */
-//	private void restartGame() {
-//		// We set gameTime to zero and lastTime to current time for later calculations.
-//		gameTime = 0;
-//		lastTime = System.nanoTime();
-//
-//		game.RestartGame();
-//
-//		// We change game status so that the game can start.
-//		gameState = GameState.PLAYING;
-//	}
+	private void restartGame() {
+		// We set gameTime to zero and lastTime to current time for later calculations.
+		gameTime = 0;
+		lastTime = System.nanoTime();
+
+		game.RestartGame();
+
+		// We change game status so that the game can start.
+		gameState = GameState.PLAYING;
+	}
 
 	/**
 	 * Returns the position of the mouse pointer in game frame/window. If mouse
@@ -330,14 +310,14 @@ public class Framework extends Canvas {
 		}
 	}
 
-	private void setCursor(boolean cursorState) {
-		if (cursorState) // mouse cursor is invisible(true)
-		{
-			BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
-			this.setCursor(blankCursor);
-		}
-	}
+//	private void setCursor(boolean cursorState) {
+//		if (cursorState) // mouse cursor is invisible(true)
+//		{
+//			BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//			Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(blankCursorImg, new Point(0, 0), null);
+//			this.setCursor(blankCursor);
+//		}
+//	}
 	/**
 	 * This method is called when keyboard key is released.
 	 * 
@@ -346,20 +326,16 @@ public class Framework extends Canvas {
 	 */
 	@Override
 	public void keyReleasedFramework(KeyEvent e) {
-//		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-//			System.exit(0);
-//
-//		switch (gameState) {
-//		case GAMEOVER:
-//			if (e.getKeyCode() == KeyEvent.VK_ENTER)
-//				restartGame();
-//			break;
-//		case MULTI_PLAY:
-//			if (e.getKeyCode() == KeyEvent.VK_ENTER)
-//				gameState = GameState.SELECT_MENU;
-//			break;
-//		default:
-//			break;
-//		}
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			System.exit(0);
+
+		switch (gameState) {
+		case GAMEOVER:
+			if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				restartGame();
+			break;
+		default:
+			break;
+		}
 	}
 }
