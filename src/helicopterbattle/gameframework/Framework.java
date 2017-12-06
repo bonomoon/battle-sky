@@ -15,9 +15,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import helicopterbattle.game.Bgm;
-import helicopterbattle.net.GameClient;
-import helicopterbattle.net.GameServer;
-import helicopterbattle.net.packets.Packet00Login;
 
 /**
  * Framework that controls the game (Game.java) that created it, update it and
@@ -62,7 +59,7 @@ public class Framework extends Canvas {
 	 * Possible states of the game
 	 */
 	public static enum GameState {
-		STARTING, VISUALIZING, GAME_CONTENT_LOADING, MAIN_MENU, SELECT_MENU, SELECT_MENU_LOADING, MULTI_PLAY, OPTIONS, PLAYING, GAMEOVER, DESTROYED
+		STARTING, VISUALIZING, GAME_CONTENT_LOADING, MAIN_MENU, SELECT_MENU, SELECT_MENU_LOADING, MULTI_MENU, OPTIONS, PLAYING, GAMEOVER, DESTROYED
 	}
 	protected static GameState gameState;
 	/**
@@ -76,11 +73,9 @@ public class Framework extends Canvas {
 	private Game game;
 	private MainMenu mainMenu;
 	private SelectMenu selectMenu;
+	private MultiMenu multiMenu;
 
 	private Font font;
-
-	private GameClient socketClient;
-	private GameServer socketServer;
 
 	// Images for menu.
 	private BufferedImage menuBackGround;
@@ -106,6 +101,7 @@ public class Framework extends Canvas {
 			public void run() {
 				mainMenu = new MainMenu();
 				selectMenu = new SelectMenu();
+				multiMenu = new MultiMenu();
 				
 			}
 		};
@@ -132,8 +128,7 @@ public class Framework extends Canvas {
 			menuBackGround = ImageIO.read(menuBackGroundUrl);
 			URL menuBorderImgUrl = this.getClass().getResource("/helicopterbattle/resources/images/menu_border.png");
 			menuBorderImg = ImageIO.read(menuBorderImgUrl);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {	
 			e.printStackTrace();
 		}
 	}
@@ -162,16 +157,11 @@ public class Framework extends Canvas {
 				break;
 			case GAMEOVER:
 				break;
-			case MULTI_PLAY:
+			case MULTI_MENU:
 				if (JOptionPane.showConfirmDialog(this, "Do you want to run the server") == 0) {
-					socketServer = new GameServer(this);
-					socketServer.start();
+					multiMenu.startServer();
 				}
-				socketClient = new GameClient(this, "localhost");
-				socketClient.start();
-				Packet00Login loginPacket = new Packet00Login(
-						JOptionPane.showInputDialog(this, "Please enter a username"));
-				loginPacket.writeData(socketClient);
+				multiMenu.startClient();
 				gameState = GameState.SELECT_MENU;
 				break;
 			case MAIN_MENU:
@@ -248,7 +238,7 @@ public class Framework extends Canvas {
 			drawMenuBackground(g2d);
 			drawGameOver(g2d);
 			break;
-		case MULTI_PLAY:
+		case MULTI_MENU:
 			drawMenuBackground(g2d);
 			break;
 		case MAIN_MENU:
@@ -273,7 +263,6 @@ public class Framework extends Canvas {
 		case GAME_CONTENT_LOADING:
 			g2d.setColor(Color.white);
 			g2d.drawString("GAME is LOADING", frameWidth / 2 - 50, frameHeight / 2);
-			newGame();
 			break;
 		default:
 			break;

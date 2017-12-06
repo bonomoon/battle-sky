@@ -8,12 +8,13 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import helicopterbattle.gameframework.Framework;
+import helicopterbattle.gameframework.MultiMenu;
 
 public class GameClient extends Thread {
 	private InetAddress ipAddress;
 	private DatagramSocket socket;
 	private Framework frame;
-	
+	private MultiMenu m;
 	public GameClient(String ipAddress) {
 		try {
 			this.socket = new DatagramSocket();
@@ -36,7 +37,18 @@ public class GameClient extends Thread {
 		}
 
 	}
+	public GameClient(MultiMenu m, String ipAddress) {
+		this.m = m;
+		try {
+			this.socket = new DatagramSocket();
+			this.ipAddress = InetAddress.getByName(ipAddress);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 
+	}
 	public void run() {
 		while (true) {
 			byte[] data = new byte[1024];

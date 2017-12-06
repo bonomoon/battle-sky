@@ -412,7 +412,7 @@ public class Game {
 	private void drawRotatedMouseCursor(Graphics2D g2d, Point mousePosition) {
         double RIGHT_ANGLE_RADIANS = Math.PI / 2;
         
-        // Positon of the player helicopter machine gun.
+        // Position of the player helicopter machine gun.
         int pivotX = player.machineGunXcoordinate;
         int pivotY = player.machineGunYcoordinate;
         
@@ -569,7 +569,26 @@ public class Game {
      * Updates helicopter animations.
      * Checks if enemy was destroyed.
      * Checks if any enemy collision with player.
-     */
+     */	
+    private void updateEnemyHelicopters() {
+		for (int i = 0; i < enemyHelicopterList.size(); i++) {
+            EnemyHelicopter eh = enemyHelicopterList.get(i);
+
+            eh.Update();
+            crashedPlayer(eh, i);
+            if(eh.health <= 0) {
+        		Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
+        		ExplosionBgm.start();
+            	checkHealth(eh, i); 
+            	continue; // Helicopter was destroyed so we can move to next helicopter.
+            }
+            // If the current enemy is left the screen we remove him from the list and update the runAwayEnemies variable.
+			if (eh.isLeftScreen()) {
+                enemyHelicopterList.remove(i);
+                runAwayEnemies++;
+            }
+        }
+	}
     private void crashedPlayer(EnemyHelicopter eh, int enemyNum) {
         // Is crashed with player?
         Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
@@ -613,27 +632,6 @@ public class Game {
 		// Remove helicopter from the list.
 		enemyHelicopterList.remove(enemyNum);
 	}
-	
-    private void updateEnemyHelicopters() {
-		for (int i = 0; i < enemyHelicopterList.size(); i++) {
-            EnemyHelicopter eh = enemyHelicopterList.get(i);
-
-            eh.Update();
-            crashedPlayer(eh, i);
-            if(eh.health <= 0) {
-        		Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
-        		ExplosionBgm.start();
-            	checkHealth(eh, i); 
-            	continue; // Helicopter was destroyed so we can move to next helicopter.
-            }
-            // If the current enemy is left the screen we remove him from the list and update the runAwayEnemies variable.
-			if (eh.isLeftScreen()) {
-                enemyHelicopterList.remove(i);
-                runAwayEnemies++;
-            }
-        }
-	}
-
 
 	private void updateEnemyTanks() {
 		for (int i = 0; i < enemyTankList.size(); i++) {

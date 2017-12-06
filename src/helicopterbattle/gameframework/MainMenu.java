@@ -133,7 +133,7 @@ public class MainMenu {
 				gameStartBtn.setVisible(false);
 				multiStartBtn.setVisible(false);
 				exitBtn.setVisible(false);
-				Framework.gameState = GameState.MULTI_PLAY;
+				Framework.gameState = GameState.MULTI_MENU;
 				return;
 			}
 		});
