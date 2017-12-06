@@ -261,8 +261,7 @@ public class Framework extends Canvas {
 			// ...
 			break;
 		case GAME_CONTENT_LOADING:
-			g2d.setColor(Color.white);
-			g2d.drawString("GAME is LOADING", frameWidth / 2 - 50, frameHeight / 2);
+			drawGameContentLoading(g2d);
 			break;
 		default:
 			break;
@@ -274,6 +273,10 @@ public class Framework extends Canvas {
 		g2d.drawImage(menuBorderImg, 0, 0, Framework.frameWidth, Framework.frameHeight, null);
 	}
 	
+	private void drawGameContentLoading(Graphics2D g2d) {
+		g2d.setColor(Color.white);
+		g2d.drawString("GAME is LOADING", frameWidth / 2 - 50, frameHeight / 2);		
+	}
 	private void drawGameOver(Graphics2D g2d) {
 		g2d.setColor(Color.black);
 		g2d.drawString("Press ENTER to restart or ESC to exit.", frameWidth / 2 - 113, frameHeight / 4 + 30);
