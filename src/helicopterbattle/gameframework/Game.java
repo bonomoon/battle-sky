@@ -605,7 +605,9 @@ public class Game {
 			EnemyHelicopter eh = enemyHelicopterList.get(i);
 
 			eh.Update();
-			crashedPlayer(eh, i);
+			if(isCrashedPlayer(eh, i)) {
+				break;
+			}
 			if (eh.health <= 0) {
 				checkHealth(eh, i);
 				Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
@@ -621,7 +623,7 @@ public class Game {
 		}
 	}
 
-	private void crashedPlayer(EnemyHelicopter eh, int enemyNum) {
+	private boolean isCrashedPlayer(EnemyHelicopter eh, int enemyNum) {
 		// Is crashed with player?
 		Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate,
 				player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
@@ -654,16 +656,18 @@ public class Game {
 			if (player.health <= 0) {
 				gameOver.start();
 			}
+			return true;
 		}
+		return false;
 	}
 
 	private void checkHealth(EnemyHelicopter eh, int enemyNum) {
 		// Add explosion of helicopter.
 		Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eh.xCoordinate,
-				eh.yCoordinate - explosionAnimImg.getHeight() / 3, 0); // Substring 1/3 explosion image height
-																		// (explosionAnimImg.getHeight()/3) so that
-																		// explosion is drawn more at the center of the
-																		// helicopter.
+				eh.yCoordinate - explosionAnimImg.getHeight() / 3, 0);
+		// Substring 1/3 explosion image height
+		// (explosionAnimImg.getHeight()/3) so that
+		// explosion is drawn more at the center of the helicopter.					
 		explosionsList.add(expAnim);
 
 		// Increase the destroyed enemies counter.
@@ -678,58 +682,14 @@ public class Game {
 			EnemyTank et = enemyTankList.get(i);
 
 			et.Update();
-
-			// Is crashed with player?
-			Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate,
-					player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
-			Rectangle enemyRectangel = new Rectangle(et.xCoordinate, et.yCoordinate, EnemyTank.tankBodyImg.getWidth(),
-					EnemyTank.tankBodyImg.getHeight());
-			if (playerRectangel.intersects(enemyRectangel)) {
-				player.health -= 200;
-
-				// Remove tank from the list.
-				enemyTankList.remove(i);
-
-				// Add explosion of player tank.
-				for (int exNum = 0; exNum < 3; exNum++) {
-					Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false,
-							player.xCoordinate + exNum * 60, player.yCoordinate - random.nextInt(100),
-							exNum * 200 + random.nextInt(100));
-					explosionsList.add(expAnim);
-				}
-				// Add explosion of enemy tank.
-				for (int exNum = 0; exNum < 3; exNum++) {
-					Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false,
-							et.xCoordinate + exNum * 60, et.yCoordinate - random.nextInt(100),
-							exNum * 200 + random.nextInt(100));
-					explosionsList.add(expAnim);
-				}
-
-				// Because player crashed with enemy the game will be over so we don't need to
-				// check other enemies.
-				gameOver.start();
+			if(isCrashedPlayer(et, i)) {
 				break;
 			}
-
 			// Check health.
 			if (et.health <= 0) {
+				checkHealth(et, i);
 				Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
 				ExplosionBgm.start();
-
-				// Add explosion of tank.
-				Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, et.xCoordinate,
-						et.yCoordinate - explosionAnimImg.getHeight() / 3, 0); // Substring 1/3 explosion image height
-																				// (explosionAnimImg.getHeight()/3) so
-																				// that explosion is drawn more at the
-																				// center of the tank.
-				explosionsList.add(expAnim);
-
-				// Increase the destroyed enemies counter.
-				destroyedEnemies++;
-
-				// Remove Tank from the list.
-				enemyTankList.remove(i);
-
 				// tank was destroyed so we can move to next tank.
 				continue;
 			}
@@ -741,6 +701,59 @@ public class Game {
 				runAwayEnemies++;
 			}
 		}
+	}
+	
+	private boolean isCrashedPlayer(EnemyTank et, int enemyNum) {
+		// Is crashed with player?
+		Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate,
+				player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
+		Rectangle enemyRectangel = new Rectangle(et.xCoordinate, et.yCoordinate, EnemyTank.tankBodyImg.getWidth(),
+				EnemyTank.tankBodyImg.getHeight());
+		if (playerRectangel.intersects(enemyRectangel)) {
+			player.health -= 200;
+			Bgm ExplosionBgm = new Bgm("explosion.mp3", false);
+			ExplosionBgm.start();
+			// Remove tank from the list.
+			enemyTankList.remove(enemyNum);
+			// Add explosion of player tank.
+			for (int exNum = 0; exNum < 3; exNum++) {
+				Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false,
+						player.xCoordinate + exNum * 60, player.yCoordinate - random.nextInt(100),
+						exNum * 200 + random.nextInt(100));
+				explosionsList.add(expAnim);
+			}
+			// Add explosion of enemy tank.
+			for (int exNum = 0; exNum < 3; exNum++) {
+				Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false,
+						et.xCoordinate + exNum * 60, et.yCoordinate - random.nextInt(100),
+						exNum * 200 + random.nextInt(100));
+				explosionsList.add(expAnim);
+			}
+
+			// Because player crashed with enemy the game will be over so we don't need to
+			// check other enemies.
+			if (player.health <= 0) {
+				gameOver.start();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void checkHealth(EnemyTank et, int enemyNum) {
+		Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, et.xCoordinate,
+				et.yCoordinate - explosionAnimImg.getHeight() / 3, 0); 
+		// Substring 1/3 explosion image height
+		// (explosionAnimImg.getHeight()/3) so
+		// that explosion is drawn more at the
+		// center of the tank.
+		explosionsList.add(expAnim);
+
+		// Increase the destroyed enemies counter.
+		destroyedEnemies++;
+
+		// Remove Tank from the list.
+		enemyTankList.remove(enemyNum);
 	}
 
 	/**

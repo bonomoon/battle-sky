@@ -5,11 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import helicopterbattle.game.Bgm;
@@ -57,7 +53,7 @@ public class Framework extends Canvas {
 	 * Possible states of the game
 	 */
 	public static enum GameState {
-		STARTING, VISUALIZING, GAME_CONTENT_LOADING, MAIN_MENU, SELECT_MENU, SELECT_MENU_LOADING, MULTI_MENU, OPTIONS, PLAYING, GAMEOVER, DESTROYED
+		VISUALIZING, GAME_CONTENT_LOADING, MAIN_MENU, SELECT_MENU, SELECT_MENU_LOADING, MULTI_MENU, OPTIONS, PLAYING, GAMEOVER, DESTROYED
 	}
 	protected static GameState gameState;
 	/**
@@ -73,7 +69,7 @@ public class Framework extends Canvas {
 	private SelectMenu selectMenu;
 	private MultiMenu multiMenu;
 
-	private Font font;
+	private Font font = new Font("monospaced", Font.BOLD, 28);
 
 	public Framework() {
 		super();
@@ -101,23 +97,6 @@ public class Framework extends Canvas {
 		};
 		threadForInitContent.start();
 	}
-
-	/**
-	 * Set variables and objects. This method is intended to set the variables and
-	 * objects for this class, variables and objects for the actual game can be set
-	 * in Game.java.
-	 */
-	private void Initialize() {
-		font = new Font("monospaced", Font.BOLD, 28);
-	}
-
-//	/**
-//	 * Load files (images). This method is intended to load files for this class,
-//	 * files for the actual game can be loaded in Game.java.
-//	 */
-//	private void LoadContent() {
-//
-//	}
 
 	/**
 	 * In specific intervals of time (GAME_UPDATE_PERIOD) the game/logic is updated
@@ -162,11 +141,6 @@ public class Framework extends Canvas {
 				introBgm.close();
 				newGame();
 				break;
-			case STARTING:
-				Initialize();
-				LoadContent();
-				gameState = GameState.MAIN_MENU;
-				break;
 			case VISUALIZING:
 				// On Ubuntu OS (when I tested on my old computer) this.getWidth() method
 				// doesn't return the correct value immediately (eg. for frame that should be
@@ -179,7 +153,7 @@ public class Framework extends Canvas {
 				if (this.getWidth() > 1 && visualizingTime > secInNanosec) {
 					frameWidth = this.getWidth();
 					frameHeight = this.getHeight();
-					gameState = GameState.STARTING;
+					gameState = GameState.MAIN_MENU;
 				} else {
 					visualizingTime += System.nanoTime() - lastVisualizingTime;
 					lastVisualizingTime = System.nanoTime();
