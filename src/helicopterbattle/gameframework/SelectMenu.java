@@ -29,18 +29,6 @@ public class SelectMenu {
 	public SelectMenu() {
 		Initialize();
 		LoadContent();
-		Framework.gameState = Framework.GameState.SELECT_MENU;
-//		Thread threadForInitSelectMenu = new Thread() {
-//			@Override
-//			public void run() {
-//				// Sets variables and objects for the game.
-//				Initialize();
-//				// Load game files (images, sounds, ...)
-//				LoadContent();
-//				Framework.gameState = Framework.GameState.SELECT_MENU;
-//			}
-//		};
-//		threadForInitSelectMenu.start();
 	}
 
 	private void Initialize() {
@@ -126,7 +114,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-//				newGame();
+				Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
 			}
 		});
 	}
@@ -151,7 +139,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-				//framework.newGame();
+				Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
 			}
 		});
 	}
@@ -176,7 +164,7 @@ public class SelectMenu {
 				heliSelectBtn.setVisible(false);
 				airBallonSelectBtn.setVisible(false);
 				heli2SelectBtn.setVisible(false);
-				//framework.newGame();
+				Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
 			}
 		});
 	}

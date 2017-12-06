@@ -100,6 +100,16 @@ public class Framework extends Canvas {
 			}
 		};
 		gameThread.start();
+		
+		Thread threadForInitContent = new Thread() {
+			@Override
+			public void run() {
+				mainMenu = new MainMenu();
+				selectMenu = new SelectMenu();
+				
+			}
+		};
+		threadForInitContent.start();
 	}
 
 	/**
@@ -170,26 +180,16 @@ public class Framework extends Canvas {
 			case SELECT_MENU:
 				selectMenu.UpdateSelectMenu();
 				break;
-			case SELECT_MENU_LOADING:
-				selectMenu = new SelectMenu();
-				break;
 			case OPTIONS:
 				break;
 			case GAME_CONTENT_LOADING:
 				introBgm.close();
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				newGame();
-				
 				break;
 			case STARTING:
 				Initialize();
 				LoadContent();
-				mainMenu = new MainMenu();
+				gameState = GameState.MAIN_MENU;
 				break;
 			case VISUALIZING:
 				// On Ubuntu OS (when I tested on my old computer) this.getWidth() method
@@ -273,6 +273,7 @@ public class Framework extends Canvas {
 		case GAME_CONTENT_LOADING:
 			g2d.setColor(Color.white);
 			g2d.drawString("GAME is LOADING", frameWidth / 2 - 50, frameHeight / 2);
+			newGame();
 			break;
 		default:
 			break;
@@ -303,12 +304,6 @@ public class Framework extends Canvas {
 		game = new Game();
 	}
 
-//	private void setGameTime(long gameTime) {
-//		this.gameTime = gameTime;
-//	}
-//	public long getGameTime() {
-//		return gameTime;
-//	}
 	/**
 	 * Restart game - reset game time and call RestartGame() method of game object
 	 * so that reset some variables.

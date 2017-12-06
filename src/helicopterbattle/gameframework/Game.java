@@ -96,7 +96,6 @@ public class Game {
     
     
 	public Game() {
-	//	Framework.gameState = Framework.GameState.GAME_CONTENT_LOADING;
         Initialize();
         LoadContent();
         Framework.gameState = Framework.GameState.PLAYING;
@@ -296,14 +295,16 @@ public class Game {
         /* Enemies */
         createEnemyHelicopter(gameTime);
         createEnemyTank(gameTime);
-        updateEnemies();
+        updateEnemyHelicopters();
+        updateEnemyTanks();
         
         /* Explosions */
         updateExplosions();
        
     }
-    
-    /**
+
+
+	/**
      * Draw the game to the screen.
      * 
      * @param g2d Graphics2D
@@ -456,18 +457,12 @@ public class Game {
 
             return minString + ":" + secString;
     }
-    
-    
-    
-    
-    
+
     /*
      * 
      * Methods for updating the game. 
      * 
-     */
-    
-     
+     */ 
     /**
      * Check if player is alive. If not, set game over status.
      * 
@@ -497,15 +492,7 @@ public class Game {
             bulletsList.add(b);
         }
     }
-    
-//    public boolean isFiredTankRocket(EnemyTank et)
-//    {
-//        // Checks if right mouse button is down && if it is the time for new rocket && if he has any rocket left.
-//        if( et.xCoordinate == Framework.frameWidth/2) {
-//            return true;
-//        } else
-//            return false;
-//    }
+
     /**
      * Checks if the player is fired the rocket and creates it if he did.
      * It also checks if player can fire the rocket.
@@ -524,17 +511,7 @@ public class Game {
             rocketsList.add(r);
         }
     }
-//    private void didEnemyTankFiredRocket(long gameTime) {
-//    	if(EnemyTank.isFiredRocket()) {
-//            Rocket.timeOfLastCreatedRocket = gameTime;
-//            EnemyTank.numberOfRockets--;
-//            
-//            Rocket r = new Rocket();
-//            r.Initialize(player.rocketHolderXcoordinate, player.rocketHolderYcoordinate);
-//            rocketsList.add(r);	
-//    	}
-//    }
-    
+
     /**
      * Creates a new enemy if it's time.
      * 
@@ -583,39 +560,40 @@ public class Game {
      * Checks if enemy was destroyed.
      * Checks if any enemy collision with player.
      */
-    private void updateEnemies()
-    {
+    private void isCrashed(EnemyHelicopter eh, int enemyNum) {
+        // Is crashed with player?
+        Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
+        Rectangle enemyRectangel = new Rectangle(eh.xCoordinate, eh.yCoordinate, EnemyHelicopter.helicopterBodyImg.getWidth(), EnemyHelicopter.helicopterBodyImg.getHeight());
+        if(playerRectangel.intersects(enemyRectangel)) {
+            player.health -= 100;
+            
+            // Remove helicopter from the list.
+            enemyHelicopterList.remove(enemyNum);
+            
+            // Add explosion of player helicopter.
+            for(int exNum = 0; exNum < 3; exNum++) {
+                Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, player.xCoordinate + exNum*60, player.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
+                explosionsList.add(expAnim);
+            }
+            // Add explosion of enemy helicopter.
+            for(int exNum = 0; exNum < 3; exNum++) {
+                Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eh.xCoordinate + exNum*60, eh.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
+                explosionsList.add(expAnim);
+            }
+            
+            // Because player crashed with enemy the game will be over so we don't need to check other enemies.
+            if(player.health <= 0) {
+            	gameOver.start();
+            }
+        }
+    }
+    
+    private void updateEnemyHelicopters() {
 		for (int i = 0; i < enemyHelicopterList.size(); i++) {
             EnemyHelicopter eh = enemyHelicopterList.get(i);
 
             eh.Update();
-            
-            // Is chrashed with player?
-            Rectangle playerRectangel = new Rectangle(player.xCoordinate, player.yCoordinate, player.helicopterBodyImg.getWidth(), player.helicopterBodyImg.getHeight());
-            Rectangle enemyRectangel = new Rectangle(eh.xCoordinate, eh.yCoordinate, EnemyHelicopter.helicopterBodyImg.getWidth(), EnemyHelicopter.helicopterBodyImg.getHeight());
-            if(playerRectangel.intersects(enemyRectangel)) {
-                player.health -= 100;
-                
-                // Remove helicopter from the list.
-                enemyHelicopterList.remove(i);
-                
-                // Add explosion of player helicopter.
-                for(int exNum = 0; exNum < 3; exNum++) {
-                    Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, player.xCoordinate + exNum*60, player.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
-                    explosionsList.add(expAnim);
-                }
-                // Add explosion of enemy helicopter.
-                for(int exNum = 0; exNum < 3; exNum++) {
-                    Animation expAnim = new Animation(explosionAnimImg, 134, 134, 12, 45, false, eh.xCoordinate + exNum*60, eh.yCoordinate - random.nextInt(100), exNum * 200 +random.nextInt(100));
-                    explosionsList.add(expAnim);
-                }
-                
-                // Because player crashed with enemy the game will be over so we don't need to check other enemies.
-                if(player.health <= 0) {
-                	gameOver.start();
-                }
-                break;
-            }
+            isCrashed(eh, i);
             
             // Check health.
             if(eh.health <= 0) {
@@ -641,7 +619,10 @@ public class Game {
                 runAwayEnemies++;
             }
         }
-		
+	}
+
+
+	private void updateEnemyTanks() {
 		for (int i = 0; i < enemyTankList.size(); i++) {
             EnemyTank et = enemyTankList.get(i);
 
@@ -698,7 +679,7 @@ public class Game {
                 runAwayEnemies++;
             }
         }
-    }
+	}
     
     /**
      * Update bullets. 

@@ -38,20 +38,7 @@ public class MainMenu {
 
 	public MainMenu() {
 		Initialize();
-		// Load game files (images, sounds, ...)
 		LoadContent();
-		Framework.gameState = Framework.GameState.MAIN_MENU;
-//		Thread threadForInitMainMenu = new Thread() {
-//			@Override
-//			public void run() {
-//				// Sets variables and objects for the game.
-//				Initialize();
-//				// Load game files (images, sounds, ...)
-//				LoadContent();
-//				Framework.gameState = Framework.GameState.MAIN_MENU;
-//			}
-//		};
-//		threadForInitMainMenu.start();
 	}
 
 	private void Initialize() {
@@ -123,7 +110,7 @@ public class MainMenu {
 				gameStartBtn.setVisible(false);
 				multiStartBtn.setVisible(false);
 				exitBtn.setVisible(false);
-				Framework.gameState = GameState.SELECT_MENU_LOADING;
+				Framework.gameState = GameState.SELECT_MENU;
 				return;
 			}
 		});
