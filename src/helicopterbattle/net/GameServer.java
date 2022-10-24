@@ -8,22 +8,18 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.text.html.parser.Entity;
-
 import helicopterbattle.game.PlayerHelicopter;
 import helicopterbattle.game.PlayerHelicopterMP;
-import helicopterbattle.gameframework.Framework;
 import helicopterbattle.net.packets.Packet;
 import helicopterbattle.net.packets.Packet.PacketTypes;
 import helicopterbattle.net.packets.Packet00Login;
-import javazoom.jl.player.Player;
 
 public class GameServer extends Thread {
 
 	private DatagramSocket socket;
-	private Framework frame;
+
 	private List<PlayerHelicopterMP> connectedPlayers = new ArrayList<PlayerHelicopterMP>();
-	public GameServer(Framework frame) {
+	public GameServer() {
 		try {
 			this.socket = new DatagramSocket(1331);
 		} catch (SocketException e) {
@@ -41,12 +37,6 @@ public class GameServer extends Thread {
 				e.printStackTrace();
 			}
 			parsePacket(packet.getData(), packet.getAddress(), packet.getPort());
-//			String message = new String(packet.getData());
-//			System.out.println("CLIENT [" + packet.getAddress().getHostAddress() + ":" + packet.getPort() + " ]> " + message);
-//			if(message.trim().equalsIgnoreCase("ping")) {
-//				System.out.println("Returning pong");
-//				sendData("pong".getBytes(), packet.getAddress(), packet.getPort());
-//			}
 		}
 	}
 	
@@ -62,7 +52,7 @@ public class GameServer extends Thread {
 				System.out.println("["+address.getHostAddress()+":"+port+"]"+packet.getUserName()+" has connected...");
 				PlayerHelicopterMP player = null;
 				if(address.getHostAddress().equalsIgnoreCase("localhost")) {
-					player = new PlayerHelicopterMP(PlayerHelicopter.xCoordinate, PlayerHelicopter.yCoordinate, packet.getUserName(), address, port);	
+//					player = new PlayerHelicopterMP(PlayerHelicopter.xCoordinate, PlayerHelicopter.yCoordinate, packet.getUserName(), address, port);	
 				}
 				if(player != null) {
 					this.connectedPlayers.add(player);
